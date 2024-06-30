@@ -22,9 +22,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 
 @Composable
@@ -37,13 +37,16 @@ fun Top3PostDetails(navController: NavHostController){
                 navController.navigateUp()
             }
         }) {paddingValues ->
-        midSectionTop3PostDetails(navController = navController, paddingValues =paddingValues )
+        midSectionTop3PostDetails(paddingValues =paddingValues )
     }
 }
 
 @Composable
-fun midSectionTop3PostDetails(navController: NavHostController,
-                              paddingValues: PaddingValues){
+fun midSectionTop3PostDetails(paddingValues: PaddingValues){
+    val title = rememberSaveable {
+        mutableStateOf("Tyla")
+    }
+
     val artist1 = rememberSaveable {
         mutableStateOf("Tyla")
     }
@@ -84,7 +87,19 @@ fun midSectionTop3PostDetails(navController: NavHostController,
             end = 10.dp,
             bottom = paddingValues.calculateBottomPadding() + 60.dp
         )) {
-        val (song1details,song2details,song3details,button) = createRefs()
+        val (playlisttitle,song1details,song2details,song3details) = createRefs()
+
+        //playlist list title
+        Text(
+            modifier = Modifier.constrainAs(playlisttitle){
+                top.linkTo(parent.top)
+                centerHorizontallyTo(parent)
+            },
+            text = title.value,
+            textDecoration = TextDecoration.Underline,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSecondary)
+
 
             // song 1
         Song(
@@ -92,7 +107,7 @@ fun midSectionTop3PostDetails(navController: NavHostController,
                 .fillMaxWidth()
                 .constrainAs(song1details) {
                     top.linkTo(
-                        parent.top,
+                        playlisttitle.bottom,
                         margin = 30.dp
                     )
                 },

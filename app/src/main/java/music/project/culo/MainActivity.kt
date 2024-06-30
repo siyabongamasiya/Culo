@@ -35,13 +35,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppNavHost(navController: NavHostController){
-    NavHost(navController = navController, startDestination = "CurrentSong"){
+    NavHost(navController = navController, startDestination = "Home"){
 
         composable("Home") {
             HomeScreen(navController)
         }
 
-        composable("CurrentSong") {
+        composable<Routes.CurrentSongScreen>{
             CurrentSongScreen(navController)
         }
 
