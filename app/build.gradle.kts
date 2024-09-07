@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
+    id ("kotlin-parcelize")
+    id("kotlin-kapt")
 }
 
 android {
@@ -10,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "music.project.culo"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -51,6 +53,7 @@ android {
 }
 
 dependencies {
+    val roomVersion = "2.6.0"
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -65,6 +68,28 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.material.icons.extended.android)
+    implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.compose)
+    implementation (libs.gson)
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.video)
+
+    //room & kapt
+    val room_version = "2.6.1"
+    implementation(libs.androidx.room.runtime.v261)
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation(libs.androidx.room.ktx.v261)
+    annotationProcessor(libs.androidx.room.compiler.v261)
+    // To use Kotlin annotation processing tool (kapt)
+    kapt("androidx.room:room-compiler:$room_version")
+
+    //FFMPEG
+    //implementation("com.arthenica:ffmpeg-kit-full:6.0-2")
+    implementation("com.arthenica:ffmpeg-kit-full-gpl:4.5.1-1")
+    //implementation("com.arthenica:mobile-ffmpeg-full:4.4")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

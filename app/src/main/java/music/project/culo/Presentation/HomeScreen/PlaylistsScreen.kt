@@ -1,10 +1,12 @@
-package music.project.culo.View
+package music.project.culo.Presentation.HomeScreen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -34,36 +38,48 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import music.project.culo.Domain.Model.Playlist
+import music.project.culo.Presentation.Components.customButton
+import music.project.culo.Presentation.PlaylistListScreen.PlaylistListViewModel
+import music.project.culo.Presentation.Routes
 import music.project.culo.R
+import music.project.culo.Utils.PlaylistProvider
+import music.project.culo.Utils.RECENTS_PLAYLIST
 import music.project.culo.Utils.iconSize
 import music.project.culo.Utils.playlistsurfaceSize
 
 @Composable
-fun PlaylistScreen(navController: NavHostController,
-                   currentSong : String){
+fun PlaylistScreen(navController: NavHostController, homeScreenViewModel: HomeScreenViewModel){
     Scaffold {paddingValues->
-        midSectionPlaylistScreen(paddingValues = paddingValues,navController,currentSong)
+        midSectionPlaylistScreen(paddingValues = paddingValues,navController,homeScreenViewModel)
     }
 
 }
 
 @Composable
-fun midSectionPlaylistScreen(paddingValues: PaddingValues,navController: NavHostController,
-                             currentSong : String){
+fun midSectionPlaylistScreen(paddingValues: PaddingValues,
+                             navController: NavHostController,
+                             homeScreenViewModel: HomeScreenViewModel){
+    val context = LocalContext.current
     val newPlaylist = rememberSaveable {
         mutableStateOf("")
     }
 
-    val playlists = rememberSaveable {
-        mutableStateOf(listOf("Jazz","Hip Hop","piano","RnB"))
+    LaunchedEffect(key1 = Unit) {
+        PlaylistProvider.collectPlaylists(context)
     }
 
-    ConstraintLayout(modifier = Modifier
+    val playlists = PlaylistProvider.playlists.collectAsState()
+    val filteredplaylists = playlists.value.filter { playlist ->
+        playlist.name != RECENTS_PLAYLIST
+    }
+
+    Column(modifier = Modifier
         .fillMaxSize()
         .background(
             brush = Brush.linearGradient(
@@ -75,17 +91,14 @@ fun midSectionPlaylistScreen(paddingValues: PaddingValues,navController: NavHost
         )
         .padding(
             10.dp
-        )) {
+        ),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
 
-        val (row,grid) = createRefs()
 
 
         //new playlist
         Row(modifier = Modifier
-            .constrainAs(row){
-                top.linkTo(parent.top,
-                    margin = paddingValues.calculateTopPadding() + 10.dp)
-            }
             .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically) {
@@ -118,30 +131,26 @@ fun midSectionPlaylistScreen(paddingValues: PaddingValues,navController: NavHost
 
             ///edit button
             customButton(text = "Add", modifier = Modifier.weight(0.3f)) {
-
+                if(newPlaylist.value.isNotEmpty()) {
+                    val newplaylist = Playlist(name = newPlaylist.value)
+                    homeScreenViewModel.addPlaylist(newplaylist,context)
+                }else{
+                    Toast.makeText(context,"Please enter the name for new Playlist!!",Toast.LENGTH_SHORT).show()
+                }
             }
 
         }
 
         //playlist grid
         LazyVerticalGrid(modifier = Modifier
-            .constrainAs(grid) {
-                top.linkTo(
-                    row.bottom,
-                    margin = 10.dp
-                )
-                bottom.linkTo(
-                    parent.bottom,
-                    margin = paddingValues.calculateBottomPadding() + 150.dp
-                )
-            },
+            .fillMaxSize(),
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)) {
 
-            items(playlists.value){playlist ->
-                playlistItem(playlist = playlist){
-                    navController.navigate(Routes.Playlist_listScreen(playlist))
+            items(filteredplaylists.toList()){playlist ->
+                playlistItem(playlist = playlist,homeScreenViewModel){
+                    navController.navigate(Routes.Playlist_listScreen(playlist.name))
                 }
             }
 
@@ -150,17 +159,21 @@ fun midSectionPlaylistScreen(paddingValues: PaddingValues,navController: NavHost
 }
 
 @Composable
-fun playlistItem(playlist : String,
+fun playlistItem(playlist: Playlist,
+                 homeScreenViewModel: HomeScreenViewModel,
                  onGoToPlaylist : () -> Unit){
+    val context = LocalContext.current
     Box(
         modifier = Modifier
-            .background(shape = RoundedCornerShape(16),
+            .background(
+                shape = RoundedCornerShape(16),
                 brush = Brush.linearGradient(
                     listOf(
                         MaterialTheme.colorScheme.surface,
                         MaterialTheme.colorScheme.secondaryContainer
                     )
-                ))
+                )
+            )
             .clickable {
                 onGoToPlaylist.invoke()
             }
@@ -175,27 +188,35 @@ fun playlistItem(playlist : String,
 
         Row (modifier = Modifier
             .fillMaxWidth()
-            .background(brush = Brush.linearGradient(
-                listOf(
-                    Color.LightGray,
-                    Color.LightGray
-                )
-            ),alpha = 0.8f,
-                shape = RoundedCornerShape(50))
+            .background(
+                brush = Brush.linearGradient(
+                    listOf(
+                        Color.LightGray,
+                        Color.LightGray
+                    )
+                ), alpha = 0.8f,
+                shape = RoundedCornerShape(50)
+            )
             .padding(10.dp)
             .align(Alignment.BottomCenter),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically){
 
-            Text(text = playlist,
+            Text(text = playlist.name,
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.Black)
 
-            Icon(
-                modifier = Modifier
-                    .size(iconSize.dp),
-                imageVector = Icons.Default.Delete,
-                contentDescription = "delete icon")
+            if (playlist.name != "Liked") {
+                Icon(
+                    modifier = Modifier
+                        .clickable {
+                            homeScreenViewModel.deletePlaylist(context, playlist)
+                        }
+                        .size(iconSize.dp),
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "delete icon"
+                )
+            }
         }
 
     }

@@ -1,6 +1,5 @@
-package music.project.culo.View
+package music.project.culo.Presentation.PostDetailsScreen
 
-import Fonts.fontFamily
 import Fonts.fontFamily2
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,48 +15,90 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import music.project.culo.Presentation.Components.customButton
+import music.project.culo.Presentation.Routes
+import music.project.culo.SongManager.SongManager
 
 @Composable
-fun PostDetailsScreen(navController: NavHostController){
-    Scaffold (topBar = {
-        topSection(navController = navController)
-    }, floatingActionButton = {
+fun PostDetailsScreen(
+    navController: NavHostController,
+    postDetailsScreenViewModel: PostDetailsScreenViewModel,
+    artist: String,
+    title: String
+){
+    val coroutineScope = rememberCoroutineScope()
+    val view = LocalView.current
+    var caption by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    var captionIsVisible by rememberSaveable {
+        mutableStateOf(true)
+    }
+
+    val currentSongDetails = SongManager.currentSongDetails.collectAsStateWithLifecycle()
+
+    Scaffold (floatingActionButton = {
         customButton(text = "Next", modifier = Modifier) {
-            navController.navigate(Routes.AudioCuttingScreen(""))
+            if (caption.isEmpty()){
+                captionIsVisible = false
+
+                coroutineScope.launch {
+                    delay(500)
+                    val url = postDetailsScreenViewModel.CreateImage(view)
+                    captionIsVisible = true
+                    navController.navigate(Routes.AudioCuttingScreen(url,currentSongDetails.value.currentTimeMs))
+                }
+            }else{
+                val url = postDetailsScreenViewModel.CreateImage(view)
+                navController.navigate(Routes.AudioCuttingScreen(url,currentSongDetails.value.currentTimeMs))
+            }
         }
     }){paddingValues ->
-        midSectionPostDetails(paddingValues = paddingValues,navController)
+        midSectionPostDetails(paddingValues = paddingValues,
+            caption = caption,
+            captionIsVisible = captionIsVisible,
+            artist = artist,
+            title = title){newString ->
+            caption = newString
+        }
     }
 }
 
 @Composable
 fun midSectionPostDetails(paddingValues: PaddingValues,
-                          navController: NavHostController){
+                          caption : String,
+                          captionIsVisible : Boolean,
+                          artist: String,
+                          title: String,
+                          onCaptionChange : (newvalue : String) -> Unit,){
     val artistName = rememberSaveable {
-        mutableStateOf("Tyla")
+        mutableStateOf(artist)
     }
 
     val songName = rememberSaveable {
-        mutableStateOf("Water")
-    }
-
-    val caption = rememberSaveable {
-        mutableStateOf("")
+        mutableStateOf(title)
     }
 
     //belong to playlist
@@ -107,10 +148,11 @@ fun midSectionPostDetails(paddingValues: PaddingValues,
                     color = MaterialTheme.colorScheme.onBackground
                 ),
                 singleLine = true,
-                onValueChange = {newText ->
+                onValueChange = { newText ->
                     artistName.value = newText
                 }, placeholder = {
-                    Text(text = "Artist Name",
+                    Text(
+                        text = "Artist Name",
                         color = Color.LightGray,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -136,10 +178,11 @@ fun midSectionPostDetails(paddingValues: PaddingValues,
                     color = MaterialTheme.colorScheme.onBackground
                 ),
                 singleLine = true,
-                onValueChange = {newText ->
+                onValueChange = { newText ->
                     songName.value = newText
                 }, placeholder = {
-                    Text(text = "Song Name",
+                    Text(
+                        text = "Song Name",
                         color = Color.LightGray,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -155,37 +198,40 @@ fun midSectionPostDetails(paddingValues: PaddingValues,
                 )
             )
 
-            //caption text field
-            TextField(
-                modifier = Modifier
-                    .background(Color.Transparent)
-                    .clip(RoundedCornerShape(16)),
-                value = caption.value,
-                textStyle = TextStyle(
-                    fontFamily = fontFamily2,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.onSecondary
-                ),
-                onValueChange = {newText ->
-                    caption.value = newText
-                }, placeholder = {
-                    Text(text = "Caption(optional)",
-                        color = Color.LightGray,
-                        style = MaterialTheme.typography.bodyMedium
+            if (captionIsVisible) {
+                //caption text field
+                TextField(
+                    modifier = Modifier
+                        .background(Color.Transparent)
+                        .clip(RoundedCornerShape(16)),
+                    value = caption,
+                    textStyle = TextStyle(
+                        fontFamily = fontFamily2,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 24.sp,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    ),
+                    onValueChange = { newText ->
+                        onCaptionChange.invoke(newText)
+                    }, placeholder = {
+                        Text(
+                            text = "Caption(optional)",
+                            color = Color.LightGray,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
+                    colors = TextFieldDefaults.colors(
+                        cursorColor = MaterialTheme.colorScheme.secondaryContainer,
+                        focusedIndicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                        unfocusedTextColor = Color.Black,
+                        focusedTextColor = Color.Black,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent
                     )
-                },
-                colors = TextFieldDefaults.colors(
-                    cursorColor = MaterialTheme.colorScheme.secondaryContainer,
-                    focusedIndicatorColor = MaterialTheme.colorScheme.secondaryContainer,
-                    unfocusedIndicatorColor = MaterialTheme.colorScheme.secondaryContainer,
-                    unfocusedTextColor = Color.Black,
-                    focusedTextColor = Color.Black,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
                 )
-            )
 
+            }
         }
 
         //number

@@ -1,81 +1,101 @@
-package music.project.culo.View
+package music.project.culo.Presentation.HomeScreen
 
-import android.content.res.Resources.Theme
-import androidx.compose.foundation.ExperimentalFoundationApi
+
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
-import music.project.culo.R
+import music.project.culo.Domain.Model.Playlist
+import music.project.culo.Presentation.Components.bottomSectionHome
+import music.project.culo.Presentation.Components.requestPermission
+import music.project.culo.Presentation.Routes
+import music.project.culo.SongManager.SongManager
+import music.project.culo.Utils.PlaylistProvider
 import music.project.culo.Utils.TestTags
-import music.project.culo.ui.theme.CuloTheme
+import music.project.culo.Utils.isDefaultPlaylistsSaved
+import music.project.culo.Utils.updateDefaultPlaylistsStatus
 import music.project.culo.ui.theme.selected_button
 
 
 
 @Composable
-fun HomeScreen(navController: NavHostController){
-    val currentsong = rememberSaveable() {
-        mutableStateOf("current song")
-    }
+fun HomeScreen(navController: NavHostController, homeScreenViewModel: HomeScreenViewModel){
+    val currentSongDetails = SongManager.currentSongDetails.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    Scaffold (bottomBar = {
-        bottomSectionHome("current song"){
-            navController.navigate(Routes.CurrentSongScreen(currentsong.value))
-        }
-    }){paddingValues ->
-
-        Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-            midSectionHome(currentsong.value,navController)
+    LaunchedEffect(key1 = Unit) {
+        val issaved = isDefaultPlaylistsSaved(context)
+        if (!issaved) {
+            homeScreenViewModel.addPlaylist(Playlist(name = "Liked"), context)
+            updateDefaultPlaylistsStatus(context)
         }
     }
 
+    requestPermission {
+        val context = LocalContext.current
+        PlaylistProvider.collectPlaylists(context)
+
+        if(currentSongDetails.value.hasStarted) {
+
+            Scaffold(bottomBar = {
+                bottomSectionHome(currentSongDetails.value.currentSong,homeScreenViewModel) {
+                    navController.navigate(Routes.CurrentSongScreen(""))
+                }
+            }) { paddingValues ->
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        bottom = paddingValues.calculateBottomPadding()
+                    )) {
+                    midSectionHome(navController, homeScreenViewModel)
+                }
+            }
+
+        }else{
+
+            Scaffold { paddingValues ->
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding())) {
+                    midSectionHome(navController, homeScreenViewModel)
+                }
+            }
+
+        }
+    }
 }
 
 @Composable
-fun midSectionHome(currentSong : String,
-                   navController: NavHostController){
+fun midSectionHome(
+    navController: NavHostController,
+    homeScreenViewModel: HomeScreenViewModel
+){
 
     var pagerState = rememberPagerState {
-        6
+        5
     }
 
     val couroutine = rememberCoroutineScope()
@@ -93,7 +113,7 @@ fun midSectionHome(currentSong : String,
         .padding(5.dp)) {
         ScrollableTabRow(selectedTabIndex = pagerState.currentPage,
             indicator = {
-                if(pagerState.currentPage < 6){
+                if(pagerState.currentPage < 5){
                     TabRowDefaults.Indicator(modifier = Modifier.tabIndicatorOffset(it[pagerState.currentPage]),
                         color = selected_button)
                 }
@@ -195,38 +215,38 @@ fun midSectionHome(currentSong : String,
                         .padding(10.dp))
             }
 
+//            Tab(selected = pagerState.currentPage == 4,
+//                modifier = Modifier.padding(5.dp),
+//                onClick = { couroutine.launch {
+//                    pagerState.animateScrollToPage(4)
+//                } }) {
+//                val bgcolor = if (pagerState.currentPage == 4){
+//                    selected_button
+//                }else{
+//                    MaterialTheme.colorScheme.secondaryContainer
+//                }
+//
+//                Text(text = "Created Videos",
+//                    style = MaterialTheme.typography.labelMedium,
+//                    color = MaterialTheme.colorScheme.onSecondary,
+//                    modifier = Modifier
+//                        .background(
+//                            bgcolor,
+//                            RoundedCornerShape(16.dp)
+//                        )
+//                        .padding(10.dp))
+//            }
+
             Tab(selected = pagerState.currentPage == 4,
-                modifier = Modifier.padding(5.dp),
-                onClick = { couroutine.launch {
-                    pagerState.animateScrollToPage(4)
-                } }) {
-                val bgcolor : Color
-                if (pagerState.currentPage == 4){
-                    bgcolor = selected_button
-                }else{
-                    bgcolor = MaterialTheme.colorScheme.secondaryContainer
-                }
-
-                Text(text = "Created Videos",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSecondary,
-                    modifier = Modifier
-                        .background(
-                            bgcolor,
-                            RoundedCornerShape(16.dp)
-                        )
-                        .padding(10.dp))
-            }
-
-            Tab(selected = pagerState.currentPage == 5,
-                modifier = Modifier.padding(5.dp)
+                modifier = Modifier
+                    .padding(5.dp)
                     .testTag(TestTags.Playlists.tag),
                 onClick = {
                     couroutine.launch {
-                        pagerState.animateScrollToPage(5)
+                        pagerState.animateScrollToPage(4)
                     }}) {
                 val bgcolor : Color
-                if (pagerState.currentPage == 5){
+                if (pagerState.currentPage == 4){
                     bgcolor = selected_button
                 }else{
                     bgcolor = MaterialTheme.colorScheme.secondaryContainer
@@ -245,67 +265,33 @@ fun midSectionHome(currentSong : String,
         }
 
         HorizontalPager(state = pagerState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .testTag(TestTags.Horizontal_Pager.tag)) {index ->
             when(index){
                 0 -> {
-                    AllScreen(navController,currentSong)
+                    AllScreen(navController,homeScreenViewModel)
                 }
 
                 1 -> {
-                    RecentleyPlayedScreen(navController,currentSong)
+                    RecentleyPlayedScreen(navController,homeScreenViewModel)
                 }
 
                 2 -> {
-                    RecentleyAddedScreen(navController,currentSong)
+                    RecentleyAddedScreen(navController,homeScreenViewModel)
                 }
 
                 3 -> {
-                    MostPlayedScreen(navController,currentSong)
+                    MostPlayedScreen(navController,homeScreenViewModel)
                 }
 
                 4 -> {
-                    CreatedVideos(navController)
+                    PlaylistScreen(navController,homeScreenViewModel)
                 }
 
-                5 -> {
-                    PlaylistScreen(navController,currentSong)
-                }
             }
         }
     }
 }
 
-@Composable
-fun bottomSectionHome(currentSong: String,onclick : ()  -> Unit){
-    Row(horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onclick.invoke() }
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(10.dp)) {
-        Icon(painter = painterResource(id = R.drawable.logoimage),
-            contentDescription = "pic",
-            modifier = Modifier
-                .width(50.dp)
-                .height(50.dp)
-                .clip(RoundedCornerShape(50)))
-        Column(horizontalAlignment = Alignment.CenterHorizontally){
-            Text(modifier = Modifier
-                .testTag(TestTags.Bottom_Bar.tag), text = "Tyla",
-                style = MaterialTheme.typography.titleMedium)
-            Text(text = "Water",
-                color = Color.LightGray,
-                style = MaterialTheme.typography.bodyMedium)
-        }
-
-        Icon(imageVector = Icons.Default.PlayArrow,
-            tint = MaterialTheme.colorScheme.onSecondary,
-            contentDescription = "play/pause",
-            modifier = Modifier
-                .width(50.dp)
-                .height(50.dp))
-    }
-}
 

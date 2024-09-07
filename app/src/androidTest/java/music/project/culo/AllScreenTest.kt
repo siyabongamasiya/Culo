@@ -7,12 +7,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.requestFocus
-import androidx.navigation.NavController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import music.project.culo.Utils.TestTags
-import music.project.culo.View.HomeScreen
+import music.project.culo.Presentation.HomeScreen.HomeScreen
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,7 +30,7 @@ class AllScreenTest {
         testRule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            HomeScreen(navController = navController)
+            HomeScreen(navController = navController, homeScreenViewModel = homeScreenViewModel)
         }
     }
 

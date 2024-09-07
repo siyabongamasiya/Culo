@@ -1,4 +1,4 @@
-package music.project.culo.View
+package music.project.culo.Presentation.Top3PostDetailsScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
+import music.project.culo.Presentation.Components.customButton
+import music.project.culo.Presentation.CurrentSongScreen.topSection
 
 @Composable
 fun Top3PostDetails(navController: NavHostController){
