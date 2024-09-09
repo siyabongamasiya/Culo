@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import music.project.culo.Data.LocalRepositoryImpl.LocalRepoImpl
 import music.project.culo.Domain.Model.Playlist
-import music.project.culo.SongManager.SongManager
 
 object PlaylistProvider{
     val localRepo = LocalRepoImpl()

@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.withContext
 import music.project.culo.CuloApp
 import music.project.culo.Data.LocalRepositoryImpl.LocalRepoImpl
 import music.project.culo.Data.Room.Database
+import music.project.culo.Domain.LocalRepository.LocalRepo
 import music.project.culo.Domain.MergeLocalAndRoomSOngs.MergeRoomAndLocal
 import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Domain.Model.Post
@@ -30,15 +32,17 @@ import music.project.culo.Utils.PlaylistProvider
 import music.project.culo.Utils.States
 import music.project.culo.Utils.audioMMIMETYPE
 import java.io.Serializable
+import javax.inject.Inject
 
-class HomeScreenViewModel: ViewModel() {
+@HiltViewModel
+class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRepo): ViewModel() {
     private var _songlist = MutableStateFlow<List<Song>>(emptyList())
     val songlist = _songlist.asStateFlow()
 
     private var  _postlist = MutableStateFlow<MutableSet<Post>>(mutableSetOf())
     val postlist = _postlist.asStateFlow()
 
-    private val localRepoImpl = LocalRepoImpl()
+
 
 
     fun collectPosts(context: Context){

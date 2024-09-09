@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import music.project.culo.Data.LocalRepositoryImpl.LocalRepoImpl
+import music.project.culo.Domain.LocalRepository.LocalRepo
 import music.project.culo.Domain.MergeLocalAndRoomSOngs.MergeRoomAndLocal
 import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Domain.Model.Song
@@ -20,9 +22,10 @@ import music.project.culo.ForegroundService.ForegroundService
 import music.project.culo.Utils.MusicActions
 import music.project.culo.Utils.PlaylistProvider
 import music.project.culo.Utils.findPlaylistbyname
+import javax.inject.Inject
 
-class PlaylistListViewModel: ViewModel() {
-    val localRepo = LocalRepoImpl()
+@HiltViewModel
+class PlaylistListViewModel @Inject constructor(private val localRepo: LocalRepo): ViewModel() {
     private var _currentPlaylist = MutableStateFlow(Playlist(name = ""))
     val currentPlaylist = _currentPlaylist.asStateFlow()
 

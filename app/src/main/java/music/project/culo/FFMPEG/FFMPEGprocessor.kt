@@ -1,20 +1,18 @@
 package music.project.culo.FFMPEG
 
 import android.net.Uri
-import music.project.culo.Utils.OverlayImage
+import kotlinx.coroutines.flow.flow
 
 
 
 class FFMPEGprocessor {
     fun OverlayOnImage(start: Long,
                        input: String,
-                       imageUrl: String) = OverlayImage(start = start,
-        audioinput = input,
-        imageUrl = imageUrl
-    )
-
-    fun hh(){
-
+                       imageUrl: String) {
+//        OverlayImage(start = start,
+//            audioinput = input,
+//            imageUrl = imageUrl)
     }
+
 }
 

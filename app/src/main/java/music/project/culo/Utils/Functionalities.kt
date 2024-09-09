@@ -17,6 +17,7 @@ import com.arthenica.ffmpegkit.FFmpegKit
 import com.arthenica.ffmpegkit.FFmpegKit.executeWithArgumentsAsync
 import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.arthenica.ffmpegkit.ReturnCode
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -35,6 +36,8 @@ import music.project.culo.Presentation.Routes
 import java.io.File
 import java.net.URLDecoder
 import java.util.concurrent.TimeUnit
+
+
 
 suspend fun ContentResolver.getSongsFromMediaStorage(context: Context) : Flow<List<Song>> {
     val contentResolver = this
@@ -94,190 +97,171 @@ fun getArt(id : String) : Uri? {
     return null
 }
 
-fun OverlayImage(
-    start: Long,
-    audioinput: String,
-    imageUrl: String,
-) = callbackFlow{
-
-    //getImagePath(imageUrl)
-    val audiooutput = generateFilename(typeAudio)
-    val coroutine = CoroutineScope(Dispatchers.Default)
-
-    val audiocommand = arrayOf("-y","-i",
-        audioinput,
-        "-ss",
-        convertSecondsToHMmSs(start),
-        "-to",
-        convertSecondsToHMmSs(start+30000),
-        audiooutput)
-
-    executeWithArgumentsAsync(audiocommand){session ->
-        if(ReturnCode.isSuccess(session.returnCode)){
-                val outputpath = generateFilename(typeVideo)
-//            cmd.add("-y");
-//            cmd.add("-loop");
-//            cmd.add("1");
+//fun OverlayImage(
+//    start: Long,
+//    audioinput: String,
+//    imageUrl: String,
+//    context: Context
+//) = callbackFlow{
 //
-//            cmd.add("-r");
-//            cmd.add("1");
-//            cmd.add("-i");
+//    //getImagePath(imageUrl)
+//    val audiooutput = generateFilename(typeAudio)
+//    val coroutine = CoroutineScope(Dispatchers.Default)
 //
-//            cmd.add(new File(imagepath).getCanonicalPath());
-//            cmd.add("-i");
-//            cmd.add(new File(musicpath).getCanonicalPath());
+//    val audiocommand = arrayOf("-y","-i",
+//        audioinput,
+//        "-ss",
+//        convertSecondsToHMmSs(start),
+//        "-to",
+//        convertSecondsToHMmSs(start+30000),
+//        audiooutput)
 //
-//            cmd.add("-b:a");
-//            cmd.add("420k");
-//            cmd.add("-strict");
+//    executeWithArgumentsAsync(audiocommand){session ->
+//        if(ReturnCode.isSuccess(session.returnCode)){
+//                val outputpath = generateFilename(typeVideo)
+////            cmd.add("-y");
+////            cmd.add("-loop");
+////            cmd.add("1");
+////
+////            cmd.add("-r");
+////            cmd.add("1");
+////            cmd.add("-i");
+////
+////            cmd.add(new File(imagepath).getCanonicalPath());
+////            cmd.add("-i");
+////            cmd.add(new File(musicpath).getCanonicalPath());
+////
+////            cmd.add("-b:a");
+////            cmd.add("420k");
+////            cmd.add("-strict");
+////
+////            cmd.add("experimental");
+////            cmd.add("-shortest");
+////            cmd.add("-f");
+////
+////            cmd.add("mp4");
+////            cmd.add("-vb");
+////            cmd.add("20M");
+////
+////            cmd.add("-r");
+////            cmd.add("2");
+////            cmd.add("-preset");
+////            cmd.add("ultrafast");
+////            cmd.add("-c:a");
+////            cmd.add("aac");
+//                val command = arrayOf("-y"
+//                    ,"-loop","1"
+//                    ,"-r","1"
+//                    ,"-i", getImagePath(imageUrl,context)
+//                    ,"-i",audiooutput
+//                    ,"-b:a","420k"
+//                    ,"-strict","experimental"
+//                    ,"-shortest"
+//                    ,"-f","mp4"
+//                    ,"-vb","20M"
+//                    ,"-r","2"
+//                    ,"-preset","ultrafast"
+//                    ,"-c:a","aac"
+//                    ,outputpath)
 //
-//            cmd.add("experimental");
-//            cmd.add("-shortest");
-//            cmd.add("-f");
+//                val command2 = arrayOf("-y"
+//                    ,"-i",audiooutput
+//                    ,"-i", getImagePath(imageUrl,context)
+//                    ,"-shortest"
+//                    , outputpath)
 //
-//            cmd.add("mp4");
-//            cmd.add("-vb");
-//            cmd.add("20M");
+//                val command3 = arrayOf(
+//                    "-y"
+//                    ,"-i", getImagePath(imageUrl,context)
+//                    ,"-i",audiooutput
+//                    ,"-c:a","aac"
+//                    ,"-c:v","libx264"
+//                    , outputpath)
 //
-//            cmd.add("-r");
-//            cmd.add("2");
-//            cmd.add("-preset");
-//            cmd.add("ultrafast");
-//            cmd.add("-c:a");
-//            cmd.add("aac");
-                val command = arrayOf("-y"
-                    ,"-loop","1"
-                    ,"-r","1"
-                    ,"-i", getImagePath(imageUrl)
-                    ,"-i",audiooutput
-                    ,"-b:a","420k"
-                    ,"-strict","experimental"
-                    ,"-shortest"
-                    ,"-f","mp4"
-                    ,"-vb","20M"
-                    ,"-r","2"
-                    ,"-preset","ultrafast"
-                    ,"-c:a","aac"
-                    ,outputpath)
+//            executeWithArgumentsAsync(command){session ->
+//                if(ReturnCode.isSuccess(session.returnCode)) {
+//                    val post = Post(
+//                        name = outputpath.substringAfterLast("/"),
+//                        type = POST_TYPE_OVERLAY,
+//                        url = outputpath
+//                    )
+//                    trySend(post)
+//                    coroutine.launch {
+//                        EventBus.updateState(States.DONE_SUCCESS.toString())
+//                    }
+//                }else{
+//                    coroutine.launch {
+//                        EventBus.updateState(States.DONE_FAILED.toString())
+//                    }
+//                }
+//            }
+//
+//        }else{
+//            coroutine.launch {
+//                EventBus.updateState(States.DONE_FAILED.toString())
+//            }
+//        }
+//    }
+//
+//
+//
+//
+//    awaitClose {
+//
+//    }
+//}
 
-                val command2 = arrayOf("-y"
-                    ,"-i",audiooutput
-                    ,"-i", getImagePath(imageUrl)
-                    ,"-shortest"
-                    , outputpath)
-
-                val command3 = arrayOf(
-                    "-y"
-                    ,"-i", getImagePath(imageUrl)
-                    ,"-i",audiooutput
-                    ,"-c:a","aac"
-                    ,"-c:v","libx264"
-                    , outputpath)
-
-            executeWithArgumentsAsync(command){session ->
-                if(ReturnCode.isSuccess(session.returnCode)) {
-                    val post = Post(
-                        name = outputpath.substringAfterLast("/"),
-                        type = POST_TYPE_OVERLAY,
-                        url = outputpath
-                    )
-                    trySend(post)
-                    coroutine.launch {
-                        EventBus.updateState(States.DONE_SUCCESS.toString())
-                    }
-                }else{
-                    coroutine.launch {
-                        EventBus.updateState(States.DONE_FAILED.toString())
-                    }
-                }
-            }
-
-        }else{
-            coroutine.launch {
-                EventBus.updateState(States.DONE_FAILED.toString())
-            }
-        }
-    }
-
-
-
-
-    awaitClose {
-
-    }
-}
-
-private fun generateFilename(type : String) : String{
-    if (type == typeVideo){
-        var count = 0
-        var file : File
-        do {
-            file = File(DESTINATIONPATH,"Video$count.mp4")
-            count++
-        }while (file.exists())
-
-        createFolderAndFile(file)
-        return file.path
-    }else{
-        var count = 0
-        var file : File
-        do {
-            file = File(DESTINATIONPATH,"Audio$count.mp3")
-            count++
-        }while (file.exists())
-
-        createFolderAndFile(file)
-        return file.path
-    }
-}
-
-private fun createFolderAndFile(newfile : File){
-    val file = File(DESTINATIONPATH)
-    if (!file.exists()) {
-        file.mkdir()
-    }
-    newfile.createNewFile()
-}
-
-fun getImagePath(uri : String) : String{
-    var filePath: String?
-
-    val _uri: Uri = Uri.parse(uri)
-
-    if ("content" == _uri.scheme) {
-        val cursor: Cursor = CuloApp.getContext().contentResolver.query(_uri, arrayOf(MediaStore.Images.ImageColumns.DATA), null, null, null)!!
-        cursor.moveToFirst()
-        Log.d("tag", _uri.toString())
-        filePath = cursor.getString(0)
-        cursor.close()
-    } else {
-        filePath = _uri!!.path
-    }
-
-
-
-    return filePath!!
-}
-
-fun getAudioPath(uri : String) : String{
-    var filePath: String?
-
-    val _uri: Uri = Uri.parse(URLDecoder.decode(uri,"UTF-8"))
-
-    if ("content" == _uri.scheme) {
-        val cursor: Cursor = CuloApp.getContext().contentResolver.query(_uri, arrayOf(MediaStore.Audio.AudioColumns.DATA), null, null, null)!!
-        cursor.moveToFirst()
-        Log.d("tag", _uri.toString())
-        filePath = cursor.getString(0)
-        cursor.close()
-    } else {
-        filePath = _uri!!.path
-    }
-
-
-
-    return filePath!!
-}
+//private fun generateFilename(type : String) : String{
+//    if (type == typeVideo){
+//        var count = 0
+//        var file : File
+//        do {
+//            file = File(DESTINATIONPATH,"Video$count.mp4")
+//            count++
+//        }while (file.exists())
+//
+//        createFolderAndFile(file)
+//        return file.path
+//    }else{
+//        var count = 0
+//        var file : File
+//        do {
+//            file = File(DESTINATIONPATH,"Audio$count.mp3")
+//            count++
+//        }while (file.exists())
+//
+//        createFolderAndFile(file)
+//        return file.path
+//    }
+//}
+//
+//private fun createFolderAndFile(newfile : File){
+//    val file = File(DESTINATIONPATH)
+//    if (!file.exists()) {
+//        file.mkdir()
+//    }
+//    newfile.createNewFile()
+//}
+//
+//fun getImagePath(uri : String,appContext: Context) : String{
+//    var filePath: String?
+//
+//    val _uri: Uri = Uri.parse(uri)
+//
+//    if ("content" == _uri.scheme) {
+//        val cursor: Cursor = appContext.contentResolver.query(_uri, arrayOf(MediaStore.Images.ImageColumns.DATA), null, null, null)!!
+//        cursor.moveToFirst()
+//        Log.d("tag", _uri.toString())
+//        filePath = cursor.getString(0)
+//        cursor.close()
+//    } else {
+//        filePath = _uri!!.path
+//    }
+//
+//
+//
+//    return filePath!!
+//}
 
 private fun convertSecondsToHMmSs(miliSeconds: Long): String {
     val hours = TimeUnit.MILLISECONDS.toHours(miliSeconds).toInt() % 24

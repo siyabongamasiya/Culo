@@ -14,6 +14,7 @@ import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.core.app.NotificationCompat
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -33,15 +34,20 @@ import music.project.culo.Utils.PAUSE
 import music.project.culo.Utils.PLAY
 import music.project.culo.Utils.PREVIOUS
 import music.project.culo.Utils.QUEDE_SONG_URL
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ForegroundService : Service() {
+
+    @Inject
+    lateinit var songManager: SongManager
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
     override fun onCreate() {
-        SongManager.createExoplayer(this)
-        SongManager.setNotifier {song ->
+        super.onCreate()
+        songManager.setNotifier {song ->
             startForeground(NOTIFICATION_ID,createNotification(song))
         }
     }
@@ -54,15 +60,15 @@ class ForegroundService : Service() {
                 val songs = intent.getParcelableExtra<Songs>(ForegroundIntentExtras.LIST.toString()) as Songs
 
 
-                SongManager.setSongs(songs)
-                startForeground(NOTIFICATION_ID,createNotification(SongManager.startSong(initialSongUrl!!)))
+                songManager.setSongs(songs)
+                startForeground(NOTIFICATION_ID,createNotification(songManager.startSong(initialSongUrl!!)))
                 scope.launch {
                     while (true){
                         delay(200)
-                        if (SongManager.isPlaying()) {
-                            SongManager.broadcastLatestCurrentTime()
+                        if (songManager.isPlaying()) {
+                            songManager.broadcastLatestCurrentTime()
                         }else{
-                            createNotification(SongManager.getCurrentSong())
+                            createNotification(songManager.getCurrentSong())
                         }
                     }
                 }
@@ -71,7 +77,7 @@ class ForegroundService : Service() {
 
             MusicActions.pauseplay.toString() -> {
                 try {
-                    startForeground(NOTIFICATION_ID, createNotification(SongManager.playOrPause()))
+                    startForeground(NOTIFICATION_ID, createNotification(songManager.playOrPause()))
                 }catch (exception : Exception){
                     stopForeground(STOP_FOREGROUND_REMOVE)
                 }
@@ -79,7 +85,7 @@ class ForegroundService : Service() {
 
             MusicActions.next.toString() -> {
                 try {
-                    startForeground(NOTIFICATION_ID, createNotification(SongManager.playNextSong()))
+                    startForeground(NOTIFICATION_ID, createNotification(songManager.playNextSong()))
                 }catch (exception : Exception){
                     stopForeground(STOP_FOREGROUND_REMOVE)
                 }
@@ -89,7 +95,7 @@ class ForegroundService : Service() {
                 try {
                     startForeground(
                         NOTIFICATION_ID,
-                        createNotification(SongManager.playPreiousSong())
+                        createNotification(songManager.playPreiousSong())
                     )
                 }catch (exception : Exception){
                     stopForeground(STOP_FOREGROUND_REMOVE)
@@ -98,18 +104,18 @@ class ForegroundService : Service() {
 
             MusicActions.seekto.toString() -> {
                 val seek = intent.getLongExtra(ForegroundIntentExtras.SEEK.toString(),0)
-                startForeground(NOTIFICATION_ID,createNotification(SongManager.SeekTo(seek)))
+                startForeground(NOTIFICATION_ID,createNotification(songManager.SeekTo(seek)))
             }
 
             MusicActions.queue.toString() -> {
                 val url = intent.getStringExtra(QUEDE_SONG_URL.toString())
                 if(url != null) {
-                    SongManager.queue(url)
+                    songManager.queue(url)
                 }
             }
 
             MusicActions.shuffle.toString() -> {
-                SongManager.shuffle()
+                songManager.shuffle()
             }
         }
         return START_STICKY
@@ -119,7 +125,7 @@ class ForegroundService : Service() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O){
             val channel = NotificationChannel(ChannelDetails.CHANNEL_ID.string,
                 ChannelDetails.CHANNEL_NAME.string,
-                NotificationManager.IMPORTANCE_LOW)
+                NotificationManager.IMPORTANCE_MIN)
 
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
@@ -152,13 +158,14 @@ class ForegroundService : Service() {
             NextIntent,PendingIntent.FLAG_IMMUTABLE)
 
 
-        if(SongManager.isPlaying()){
+        if(songManager.isPlaying()){
             val builder = NotificationCompat
                 .Builder(this,ChannelDetails.CHANNEL_ID.string)
                 .setSmallIcon(R.drawable.logoimage)
                 .setContentTitle(song.title)
                 .setContentText(song.artist)
                 .setAutoCancel(false)
+                .setVibrate(LongArray(0))
                 .addAction(R.drawable.baseline_arrow_back_ios_new_24, PREVIOUS,previousPendingIntent)
                 .addAction(R.drawable.baseline_play_arrow_24, PAUSE,playpausePendingIntent)
                 .addAction(R.drawable.baseline_arrow_forward_ios_24, NEXT,nextPendingIntent)
@@ -171,7 +178,9 @@ class ForegroundService : Service() {
                 .setSmallIcon(R.drawable.logoimage)
                 .setContentTitle(song.title)
                 .setContentText(song.artist)
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .setAutoCancel(false)
+                .setVibrate(LongArray(0))
                 .addAction(R.drawable.baseline_arrow_back_ios_new_24, PREVIOUS,previousPendingIntent)
                 .addAction(R.drawable.baseline_play_arrow_24, PLAY,playpausePendingIntent)
                 .addAction(R.drawable.baseline_arrow_forward_ios_24, NEXT,nextPendingIntent)

@@ -70,7 +70,7 @@ import music.project.culo.Presentation.Components.customButton
 import music.project.culo.Presentation.Components.playlist
 import music.project.culo.Presentation.Components.requestImages
 import music.project.culo.Presentation.Routes
-import music.project.culo.SongManager.SongManager
+import music.project.culo.Utils.SongManager
 import music.project.culo.Utils.ShareSong
 import music.project.culo.Utils.TestTags
 import music.project.culo.Utils.iconSize
@@ -521,7 +521,7 @@ fun Controls(modifier: Modifier,currentSongScreenViewModel: CurrentSongScreenVie
             },
             onValueChange = {percentage->
                 val newPosition = currentSongDetails.value.currentSong.duration.toLong()*percentage
-                currentSongScreenViewModel.SeekTo(newPosition.toLong())
+                currentSongScreenViewModel.SeekTo(newPosition.toLong(),context)
             },
             modifier = Modifier
                 .fillMaxWidth()

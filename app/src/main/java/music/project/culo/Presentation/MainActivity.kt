@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import dagger.hilt.android.AndroidEntryPoint
 import music.project.culo.Presentation.AudioCuttingScreen.AudioCuttingSceenViewModel
 import music.project.culo.Presentation.AudioCuttingScreen.AudioCuttingScreen
 import music.project.culo.Presentation.CurrentSongScreen.CurrentSongScreen
@@ -33,10 +34,18 @@ import music.project.culo.Presentation.PostDetailsScreen.PostDetailsScreenViewMo
 import music.project.culo.Presentation.PostViewer.DrawPostViewerScreen
 import music.project.culo.Presentation.PostViewer.PostViewerViewModel
 import music.project.culo.Presentation.Top3PostDetailsScreen.Top3PostDetails
+import music.project.culo.Utils.AUDIO_CUTTING_SCREEN_VIEWMODEL
+import music.project.culo.Utils.CURRENT_SONG_SCREEN_VIEWMODEL
 import music.project.culo.Utils.EventBus
+import music.project.culo.Utils.HOME_SCREEN_VIEWMODEL
+import music.project.culo.Utils.PLAYLIST_LIST_SCREEN_VIEWMODEL
+import music.project.culo.Utils.POST_DETAILS_SCREEN_VIEWMODEL
+import music.project.culo.Utils.POST_VIEWER_SCREEN_VIEWMODEL
 import music.project.culo.Utils.States
+import music.project.culo.Utils.ViewmodelFactory
 import music.project.culo.ui.theme.CuloTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,27 +84,27 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppNavHost(navController: NavHostController){
-    val homeScreenViewModel = HomeScreenViewModel()
-    val playlistListViewModel = PlaylistListViewModel()
-    val currentSongScreenViewModel = CurrentSongScreenViewModel()
-    val audioCuttingSceenViewModel = AudioCuttingSceenViewModel()
-    val postDetailsScreenViewModel = PostDetailsScreenViewModel()
-    val postViewerViewModel =  PostViewerViewModel()
+    val homeScreenViewModel = ViewmodelFactory.createViewModel(type = HOME_SCREEN_VIEWMODEL)
+    val playlistListViewModel = ViewmodelFactory.createViewModel(type = PLAYLIST_LIST_SCREEN_VIEWMODEL)
+    val currentSongScreenViewModel = ViewmodelFactory.createViewModel(type = CURRENT_SONG_SCREEN_VIEWMODEL)
+    val audioCuttingSceenViewModel = ViewmodelFactory.createViewModel(type = AUDIO_CUTTING_SCREEN_VIEWMODEL)
+    val postDetailsScreenViewModel = ViewmodelFactory.createViewModel(type = POST_DETAILS_SCREEN_VIEWMODEL)
+    val postViewerViewModel =  ViewmodelFactory.createViewModel(type = POST_VIEWER_SCREEN_VIEWMODEL)
 
     NavHost(navController = navController, startDestination = "Home"){
 
         composable("Home") {
-            HomeScreen(navController,homeScreenViewModel)
+            HomeScreen(navController,homeScreenViewModel!! as HomeScreenViewModel)
         }
 
         composable<Routes.CurrentSongScreen>{
-            CurrentSongScreen(navController,currentSongScreenViewModel)
+            CurrentSongScreen(navController,currentSongScreenViewModel!! as CurrentSongScreenViewModel)
         }
 
         composable<Routes.Playlist_listScreen> {
             val args = it.toRoute<Routes.Playlist_listScreen>()
             val playlistname = args.playlistname
-            PlaylistlistScreen(navController,playlistname,playlistListViewModel)
+            PlaylistlistScreen(navController,playlistname,playlistListViewModel!! as PlaylistListViewModel)
         }
 
         composable<Routes.PostDetailsScreen> {
@@ -103,7 +112,7 @@ fun AppNavHost(navController: NavHostController){
             val artist = route.artist
             val title = route.title
 
-            PostDetailsScreen(navController,postDetailsScreenViewModel,artist,title)
+            PostDetailsScreen(navController,postDetailsScreenViewModel!! as PostDetailsScreenViewModel,artist,title)
         }
 
         composable<Routes.AudioCuttingScreen> {
@@ -111,7 +120,7 @@ fun AppNavHost(navController: NavHostController){
             val url = route.uri
             val currentTime = route.currentTime
 
-            AudioCuttingScreen(navController,url,audioCuttingSceenViewModel,currentTime)
+            AudioCuttingScreen(navController,url,audioCuttingSceenViewModel!! as AudioCuttingSceenViewModel,currentTime)
         }
 
         composable<Routes.Top3PostDetailsScreen> {
@@ -123,7 +132,7 @@ fun AppNavHost(navController: NavHostController){
             val url = route.url
 
 
-            DrawPostViewerScreen(navController = navController, url = url,postViewerViewModel)
+            DrawPostViewerScreen(navController = navController, url = url,postViewerViewModel!! as PostViewerViewModel)
         }
     }
 }

@@ -50,7 +50,7 @@ import androidx.navigation.NavHostController
 import music.project.culo.Presentation.Components.customButton
 import music.project.culo.Presentation.CurrentSongScreen.topSection
 import music.project.culo.R
-import music.project.culo.SongManager.SongManager
+import music.project.culo.Utils.SongManager
 import music.project.culo.Utils.Instruction
 import music.project.culo.Utils.OutofRange
 import music.project.culo.Utils.iconSize
@@ -63,17 +63,18 @@ fun AudioCuttingScreen(
     currentTime: Long
 ){
 
+    val context = LocalContext.current
     audioCuttingSceenViewModel.setImageUrl(url)
     audioCuttingSceenViewModel.setCurrentTime(currentTime)
 
     BackHandler {
-        audioCuttingSceenViewModel.resetTimeToCurrentTime()
+        audioCuttingSceenViewModel.resetTimeToCurrentTime(context)
         navController.navigateUp()
     }
 
     Scaffold (topBar = {
         topSection(navController = navController, isAudioCutting = true, onAudioScreenBackPressed = {
-            audioCuttingSceenViewModel.resetTimeToCurrentTime()
+            audioCuttingSceenViewModel.resetTimeToCurrentTime(context)
         })
     },
         bottomBar = {
@@ -248,11 +249,11 @@ fun audioCuttingControls(modifier: Modifier,navController: NavHostController,aud
             ),
             onValueChangeFinished = {
                 audioCuttingSceenViewModel.calculateRange(currentSongDetails.value.currentTimeMs,
-                    currentSongDetails.value.currentSong.duration.toLong())
+                    currentSongDetails.value.currentSong.duration.toLong(),context)
             },
             onValueChange = { percentage ->
                 val newPosition = currentSongDetails.value.currentSong.duration.toLong()*percentage
-                audioCuttingSceenViewModel.SeekTo(newPosition.toLong())
+                audioCuttingSceenViewModel.SeekTo(newPosition.toLong(),context)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -304,7 +305,7 @@ fun audioCuttingControls(modifier: Modifier,navController: NavHostController,aud
                 context
             )
 
-            audioCuttingSceenViewModel.resetTimeToCurrentTime()
+            audioCuttingSceenViewModel.resetTimeToCurrentTime(context)
 
             navController.navigate("Home"){
                 popUpTo(0){

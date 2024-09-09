@@ -31,7 +31,7 @@ import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Presentation.Components.bottomSectionHome
 import music.project.culo.Presentation.Components.requestPermission
 import music.project.culo.Presentation.Routes
-import music.project.culo.SongManager.SongManager
+import music.project.culo.Utils.SongManager
 import music.project.culo.Utils.PlaylistProvider
 import music.project.culo.Utils.TestTags
 import music.project.culo.Utils.isDefaultPlaylistsSaved

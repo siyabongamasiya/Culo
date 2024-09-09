@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import music.project.culo.CuloApp
 import music.project.culo.Data.LocalRepositoryImpl.LocalRepoImpl
+import music.project.culo.Domain.LocalRepository.LocalRepo
 import music.project.culo.Domain.Model.CurrentSongDetails
 import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Domain.Model.Song
@@ -24,28 +26,21 @@ import music.project.culo.ForegroundService.ForegroundService
 import music.project.culo.Utils.MusicActions
 import music.project.culo.Utils.PlaylistProvider
 import music.project.culo.Utils.RECENTS_PLAYLIST
+import music.project.culo.Utils.SongManager
 import music.project.culo.Utils.getPlayMode
 import music.project.culo.Utils.savedPlayMode
+import javax.inject.Inject
 
-object SongManager {
-    lateinit var exoPlayer : ExoPlayer
+class SongManager(val exoPlayer: ExoPlayer,
+                  val localrepo: LocalRepo,
+                  val context: CuloApp) {
+
     lateinit var songList: List<Song>
     var queue : MutableList<Song> = mutableListOf()
     var showNotification : (song : Song) -> Unit = {}
     private var currentSong = Song()
-    private var localrepo = LocalRepoImpl()
 
 
-    private var _currentSongDetails = MutableStateFlow(CurrentSongDetails())
-    val currentSongDetails = _currentSongDetails.asStateFlow()
-
-    private var recentplays = Playlist(name = RECENTS_PLAYLIST)
-
-
-
-    fun createExoplayer(context: Context){
-       exoPlayer = ExoPlayer.Builder(context).build()
-    }
 
     fun getCurrentSong() : Song{
         return currentSong
@@ -54,9 +49,8 @@ object SongManager {
         this.showNotification = notifier
     }
 
-    fun setInitialRecents(playlist: Playlist){
-        recentplays = playlist
-    }
+
+
     fun startSong(url : String) : Song{
         val mediaitems = songList.let { list ->
             val mediaItems : MutableList<MediaItem> = mutableListOf()
@@ -113,7 +107,7 @@ object SongManager {
             setMediaItems(mediaitems)
             addListener(listener)
             seekToDefaultPosition(initialPosition)
-            val rMode = getPlayMode(CuloApp.getContext())
+            val rMode = getPlayMode(context)
             if(rMode != -1){
                 repeatMode = rMode
                 exoPlayer.shuffleModeEnabled = false
@@ -127,7 +121,7 @@ object SongManager {
         val startsong = songList[initialPosition]
         currentSong = startsong
         increasePlays(currentSong)
-        UpdateCurrentSong(exoPlayer.currentPosition,startsong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
+        SongManager.UpdateCurrentSong(exoPlayer.currentPosition,startsong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
         return startsong
     }
 
@@ -143,37 +137,45 @@ object SongManager {
         val coroutineScope = CoroutineScope(Dispatchers.IO)
         topIt(song)
 
+
+        val savableplaylist = SongManager.recentplays
+
         song.plays++
         coroutineScope.launch {
-            localrepo.saveSong(CuloApp.getContext(),song)
-            localrepo.updatePlaylist(CuloApp.getContext(),recentplays)
+            localrepo.saveSong(context,song)
+            if (SongManager.recentplays.songs.songList.size == 1) {
+                localrepo.savePlaylist(context, savableplaylist)
+                //Log.d("tag", "${recentplays.songs.songList.size} none")
+            }else{
+                localrepo.updatePlaylist(context, savableplaylist)
+                //Log.d("tag", "${recentplays.songs.songList.size} some")
+            }
+            //Log.d("tag", "${recentplays.songs.songList.size} items 3")
         }
     }
 
     private fun topIt(song: Song){
         val index = isInRecents(song)
         if (index >= 0){
-            val mutablelist = recentplays.songs.songList.toMutableList()
+            val mutablelist = SongManager.recentplays.songs.songList.toMutableList()
             val removedsong = mutablelist.removeAt(index)
             val newlist : MutableList<Song> = mutableListOf()
             newlist.addAll(mutablelist)
             newlist.add(removedsong)
 
-            recentplays.songs.songList = newlist
+            SongManager.recentplays.songs.songList = newlist
         }else{
-            val mutablelist = recentplays.songs.songList.toMutableList()
+            val mutablelist = SongManager.recentplays.songs.songList.toMutableList()
             val newlist : MutableList<Song> = mutableListOf()
             newlist.addAll(mutablelist)
             newlist.add(song)
 
-            recentplays.songs.songList = newlist
+            SongManager.recentplays.songs.songList = newlist
         }
-
-
     }
 
     private fun isInRecents(searchedSong : Song) : Int{
-        recentplays.songs.songList.forEachIndexed{index,song ->
+        SongManager.recentplays.songs.songList.forEachIndexed{index,song ->
             if (song.url == searchedSong.url){
                 return index
             }
@@ -190,7 +192,7 @@ object SongManager {
         }
 
         val currentSong = songList[exoPlayer.currentMediaItemIndex]
-        UpdateCurrentSong(exoPlayer.currentPosition,currentSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
+        SongManager.UpdateCurrentSong(exoPlayer.currentPosition,currentSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
 
         this.currentSong = currentSong
         return currentSong
@@ -199,7 +201,7 @@ object SongManager {
     fun SeekTo(target : Long) : Song{
         exoPlayer.seekTo(target)
         val latestSong = songList[exoPlayer.currentMediaItemIndex]
-        UpdateCurrentSong(target,latestSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
+        SongManager.UpdateCurrentSong(target,latestSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
         this.currentSong = latestSong
         return songList[exoPlayer.currentMediaItemIndex]
     }
@@ -207,13 +209,13 @@ object SongManager {
     fun broadcastLatestCurrentTime(){
         val latestSong = songList[exoPlayer.currentMediaItemIndex]
         this.currentSong = latestSong
-        UpdateCurrentSong(exoPlayer.currentPosition,latestSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
+        SongManager.UpdateCurrentSong(exoPlayer.currentPosition,latestSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
     }
 
     fun playNextSong() : Song{
         exoPlayer.seekToNext()
         val latestSong = songList[exoPlayer.currentMediaItemIndex]
-        UpdateCurrentSong(0L,latestSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
+        SongManager.UpdateCurrentSong(0L,latestSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
         this.currentSong = latestSong
         return latestSong
     }
@@ -221,7 +223,7 @@ object SongManager {
     fun playPreiousSong() : Song{
         exoPlayer.seekToPrevious()
         val latestSong = songList[exoPlayer.currentMediaItemIndex]
-        UpdateCurrentSong(0L,latestSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
+        SongManager.UpdateCurrentSong(0L,latestSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
         this.currentSong = latestSong
         return latestSong
     }
@@ -230,19 +232,19 @@ object SongManager {
         if (exoPlayer.repeatMode == ExoPlayer.REPEAT_MODE_ONE && !exoPlayer.shuffleModeEnabled){
             exoPlayer.repeatMode = ExoPlayer.REPEAT_MODE_ALL
             exoPlayer.shuffleModeEnabled = false
-            savedPlayMode(ExoPlayer.REPEAT_MODE_ALL,CuloApp.getContext())
+            savedPlayMode(ExoPlayer.REPEAT_MODE_ALL,context)
         }else if (exoPlayer.repeatMode == ExoPlayer.REPEAT_MODE_ALL && !exoPlayer.shuffleModeEnabled){
             exoPlayer.shuffleModeEnabled = true
-            savedPlayMode(-1,CuloApp.getContext())
+            savedPlayMode(-1,context)
         }else if (exoPlayer.shuffleModeEnabled){
             exoPlayer.repeatMode = ExoPlayer.REPEAT_MODE_ONE
-            savedPlayMode(ExoPlayer.REPEAT_MODE_ONE,CuloApp.getContext())
+            savedPlayMode(ExoPlayer.REPEAT_MODE_ONE,context)
             exoPlayer.shuffleModeEnabled = false
         }
 
         val currentSong = songList[exoPlayer.currentMediaItemIndex]
         this.currentSong = currentSong
-        UpdateCurrentSong(exoPlayer.currentPosition,currentSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
+        SongManager.UpdateCurrentSong(exoPlayer.currentPosition,currentSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
     }
 
     fun getSong(index : Int): Song {
@@ -257,79 +259,5 @@ object SongManager {
         return  exoPlayer.isPlaying ||
                 exoPlayer.isLoading ||
                 (exoPlayer.playbackState == ExoPlayer.STATE_BUFFERING)
-    }
-
-    fun UpdateCurrentSong(currentTimeMs : Long,
-                          currentSong : Song,
-                          currentRepeatMode : Int,
-                          isplaying : Boolean,
-                          shuffleModeOn : Boolean = false){
-
-        val currenttime = formatCurrentTime(currentTimeMs)
-        val currenttotaltime = formatTotalTime(currentSong)
-        val currentrepeatmode = currentRepeatMode
-
-        _currentSongDetails.value = CurrentSongDetails(
-            currenttime,
-            currenttotaltime,
-            currentTimeMs,
-            currentSong.duration.toLong(),
-            isplaying,
-            currentSong,
-            currentrepeatmode,
-            true,
-            shuffleModeOn)
-    }
-
-    fun formatCurrentTime(currentTime: Long) : String{
-        //calculate current time
-        val Ctotalsecs = currentTime/1000
-        val CMinutes = Ctotalsecs/60
-        val Csecs = Ctotalsecs%60
-
-        //formating
-        var Cminutesformatted = ""
-        var Csecsformatted  = ""
-
-        //adding zeros if less than 9
-        if (CMinutes <= 9){
-            Cminutesformatted = "0${CMinutes}"
-        }else{
-            Cminutesformatted = "${CMinutes}"
-        }
-
-        if (Csecs <= 9){
-            Csecsformatted = "0${Csecs}"
-        }else{
-            Csecsformatted = "${Csecs}"
-        }
-
-        return "$Cminutesformatted : $Csecsformatted"
-    }
-
-    private fun formatTotalTime(song: Song) : String{
-        //calculate total time
-        val Ttotalsecs = song.duration.toLong()/1000
-        val TMinutes = Ttotalsecs/60
-        val Tsecs = Ttotalsecs%60
-
-        //formating
-        var Tminutesformatted = ""
-        var Tsecsformatted  = ""
-
-        //adding zeros if less than 9
-        if (TMinutes <= 9){
-            Tminutesformatted = "0${TMinutes}"
-        }else{
-            Tminutesformatted = "${TMinutes}"
-        }
-
-        if (Tsecs <= 9){
-            Tsecsformatted = "0${Tsecs}"
-        }else{
-            Tsecsformatted = "${Tsecs}"
-        }
-
-        return "$Tminutesformatted : $Tsecsformatted"
     }
 }

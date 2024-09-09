@@ -75,7 +75,7 @@ import music.project.culo.Presentation.HomeScreen.HomeScreenViewModel
 import music.project.culo.Presentation.PlaylistListScreen.PlaylistListViewModel
 import music.project.culo.Presentation.Routes
 import music.project.culo.R
-import music.project.culo.SongManager.SongManager
+import music.project.culo.Utils.SongManager
 import music.project.culo.Utils.Navigate
 import music.project.culo.Utils.PlaylistProvider
 import music.project.culo.Utils.QueueSong
@@ -271,7 +271,9 @@ fun Songlist(modifier: Modifier,
             modifier = modifier,
             state = scrollstate!!,
             verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(songlist){song->
+            items(songlist, key = {song ->
+                song.url
+            }){song->
                 songItem(song,
                     isplaylist = isplaylist
                     , OnShowOptions = {isAplaylist,providedSong ->

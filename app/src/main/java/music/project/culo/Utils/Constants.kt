@@ -34,6 +34,15 @@ enum class operatorOptions(val option : String){
     Overlay_On_Image("Overlay on Image"),
 }
 
+//viewmodel
+val AUDIO_CUTTING_SCREEN_VIEWMODEL = "AUDIO CUTTING SCREEN VIEWMODEL"
+val CURRENT_SONG_SCREEN_VIEWMODEL = "CURRENT SONG SCREEN VIEWMODEL"
+val HOME_SCREEN_VIEWMODEL = "HOME SCREEN VIEWMODEL"
+val PLAYLIST_LIST_SCREEN_VIEWMODEL = "PLAYLIST LIST SCREEN VIEWMODEL"
+val POST_DETAILS_SCREEN_VIEWMODEL = "POST DETAILS SCREEN VIEWMODEL"
+val POST_VIEWER_SCREEN_VIEWMODEL = "POST VIEWER SCREEN VIEWMODEL"
+val TOP3_POST_DETAILS_SCREEN_VIEWMODEL = "TOP3 POST DETAILS SCREEN VIEWMODELS"
+
 //val kebabiconSize = 50
 val iconSize = 30
 val songOperatorsize = 80
@@ -57,7 +66,7 @@ val NOTIFICATION_ID = 1
 val audioMMIMETYPE = "audio/*"
 val QUEDE_SONG_URL = 0
 
-val DESTINATIONPATH = CuloApp.getContext().filesDir.path + "/Culo"
+//val DESTINATIONPATH = CuloApp.getContext().filesDir.path + "/Culo"
 val typeVideo ="Video"
 val typeAudio = "Audio"
 

@@ -38,7 +38,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import music.project.culo.Presentation.Components.customButton
 import music.project.culo.Presentation.Routes
-import music.project.culo.SongManager.SongManager
+import music.project.culo.Utils.SongManager
 
 @Composable
 fun PostDetailsScreen(
