@@ -18,7 +18,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "music.project.culo.HiltRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -97,7 +97,12 @@ dependencies {
     implementation("com.arthenica:ffmpeg-kit-full-gpl:4.5.1-1")
     //implementation("com.arthenica:mobile-ffmpeg-full:4.4")
 
+    //turbine for ing flows
+    implementation("app.cash.turbine:turbine:1.1.0")
     testImplementation(libs.junit)
+    testImplementation("com.google.truth:truth:1.0.1")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    androidTestImplementation("com.google.truth:truth:1.0.1")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -105,6 +110,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
 }
 
 // Allow references to generated code

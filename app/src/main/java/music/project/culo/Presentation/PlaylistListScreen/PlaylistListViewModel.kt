@@ -2,18 +2,13 @@ package music.project.culo.Presentation.PlaylistListScreen
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import music.project.culo.Data.LocalRepositoryImpl.LocalRepoImpl
 import music.project.culo.Domain.LocalRepository.LocalRepo
 import music.project.culo.Domain.MergeLocalAndRoomSOngs.MergeRoomAndLocal
 import music.project.culo.Domain.Model.Playlist
@@ -42,7 +37,7 @@ class PlaylistListViewModel @Inject constructor(private val localRepo: LocalRepo
 
         viewModelScope.launch(Dispatchers.IO) {
 
-            MergeRoomAndLocal(context){modifiedList ->
+            MergeRoomAndLocal(context,localRepo){modifiedList ->
                 val sortedlist = modifiedList.sortedBy {song ->
                     song.artist
                 }

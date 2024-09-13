@@ -22,8 +22,8 @@ object SongManager{
                           isplaying : Boolean,
                           shuffleModeOn : Boolean = false){
 
-        val currenttime = formatCurrentTime(currentTimeMs)
-        val currenttotaltime = formatTotalTime(currentSong)
+        val currenttime = convertSecondsToHMmSs(currentTimeMs)
+        val currenttotaltime = convertSecondsToHMmSs(currentSong.duration.toLong())
         val currentrepeatmode = currentRepeatMode
 
         _currentSongDetails.value = CurrentSongDetails(
@@ -36,58 +36,6 @@ object SongManager{
             currentrepeatmode,
             true,
             shuffleModeOn)
-    }
-
-    fun formatCurrentTime(currentTime: Long) : String{
-        //calculate current time
-        val Ctotalsecs = currentTime/1000
-        val CMinutes = Ctotalsecs/60
-        val Csecs = Ctotalsecs%60
-
-        //formating
-        var Cminutesformatted = ""
-        var Csecsformatted  = ""
-
-        //adding zeros if less than 9
-        if (CMinutes <= 9){
-            Cminutesformatted = "0${CMinutes}"
-        }else{
-            Cminutesformatted = "${CMinutes}"
-        }
-
-        if (Csecs <= 9){
-            Csecsformatted = "0${Csecs}"
-        }else{
-            Csecsformatted = "${Csecs}"
-        }
-
-        return "$Cminutesformatted : $Csecsformatted"
-    }
-
-    private fun formatTotalTime(song: Song) : String{
-        //calculate total time
-        val Ttotalsecs = song.duration.toLong()/1000
-        val TMinutes = Ttotalsecs/60
-        val Tsecs = Ttotalsecs%60
-
-        //formating
-        var Tminutesformatted = ""
-        var Tsecsformatted  = ""
-
-        //adding zeros if less than 9
-        if (TMinutes <= 9){
-            Tminutesformatted = "0${TMinutes}"
-        }else{
-            Tminutesformatted = "${TMinutes}"
-        }
-
-        if (Tsecs <= 9){
-            Tsecsformatted = "0${Tsecs}"
-        }else{
-            Tsecsformatted = "${Tsecs}"
-        }
-
-        return "$Tminutesformatted : $Tsecsformatted"
     }
 
 }

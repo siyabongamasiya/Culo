@@ -28,7 +28,7 @@ class HomescreenTest {
         testRule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            HomeScreen(navController = navController, homeScreenViewModel = homeScreenViewModel)
+            //HomeScreen(navController = navController, homeScreenViewModel = homeScreenViewModel)
         }
     }
     @Test

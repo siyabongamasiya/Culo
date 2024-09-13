@@ -8,7 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import music.project.culo.CuloApp
-import music.project.culo.Data.LocalRepositoryImpl.LocalRepoImpl
+import music.project.culo.Data.local.LocalRepoImpl
 import music.project.culo.Domain.LocalRepository.LocalRepo
 import music.project.culo.FFMPEG.FFMPEGprocessor
 import music.project.culo.SongManager.SongManager

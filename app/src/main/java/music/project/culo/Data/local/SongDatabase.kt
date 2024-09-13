@@ -1,37 +1,35 @@
-package music.project.culo.Data.Room
+package music.project.culo.Data.local
 
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Domain.Model.Post
 import music.project.culo.Domain.Model.Song
-import music.project.culo.Domain.Model.Songs
 import music.project.culo.Utils.ListConverter
 
 @androidx.room.Database(entities = [Song::class,Playlist::class,Post::class], exportSchema = true, version = 1)
 @TypeConverters(ListConverter::class)
-abstract class Database : RoomDatabase(){
+abstract class SongDatabase : RoomDatabase(){
     abstract fun getDAO() : SongDAO
 
     companion object{
-        var DATABASE_INSTANCE : Database? = null
+        var SongDATABASE_INSTANCE : SongDatabase? = null
 
-        fun getDatabaseInsatance(context: Context) : Database{
-            if(DATABASE_INSTANCE == null) {
+        fun getDatabaseInsatance(context: Context) : SongDatabase{
+            if(SongDATABASE_INSTANCE == null) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    Database::class.java,
+                    SongDatabase::class.java,
                     "Songs Database"
                 ).fallbackToDestructiveMigration()
                     .build()
-                DATABASE_INSTANCE = instance
+                SongDATABASE_INSTANCE = instance
                 // return instance
                 return instance
             }else{
-               return DATABASE_INSTANCE as Database
+               return SongDATABASE_INSTANCE as SongDatabase
             }
         }
     }

@@ -3,10 +3,8 @@ package music.project.culo.Domain.Model
 import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
-import music.project.culo.Data.Room.SongDAO
 
 @Parcelize
 @Entity(tableName = "Songs")

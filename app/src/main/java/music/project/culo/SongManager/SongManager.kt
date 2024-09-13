@@ -1,35 +1,18 @@
 package music.project.culo.SongManager
 
-import android.content.Context
-import android.content.Intent
-import android.media.metrics.PlaybackStateEvent
-import android.util.Log
-import android.widget.Toast
-import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import music.project.culo.CuloApp
-import music.project.culo.Data.LocalRepositoryImpl.LocalRepoImpl
 import music.project.culo.Domain.LocalRepository.LocalRepo
-import music.project.culo.Domain.Model.CurrentSongDetails
-import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Domain.Model.Song
 import music.project.culo.Domain.Model.Songs
-import music.project.culo.ForegroundService.ForegroundService
-import music.project.culo.Utils.MusicActions
-import music.project.culo.Utils.PlaylistProvider
-import music.project.culo.Utils.RECENTS_PLAYLIST
 import music.project.culo.Utils.SongManager
 import music.project.culo.Utils.getPlayMode
 import music.project.culo.Utils.savedPlayMode
-import javax.inject.Inject
 
 class SongManager(val exoPlayer: ExoPlayer,
                   val localrepo: LocalRepo,

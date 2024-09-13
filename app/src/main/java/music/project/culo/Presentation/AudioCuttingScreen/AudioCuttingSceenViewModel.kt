@@ -2,18 +2,12 @@ package music.project.culo.Presentation.AudioCuttingScreen
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import music.project.culo.CuloApp
-import music.project.culo.Data.LocalRepositoryImpl.LocalRepoImpl
 import music.project.culo.Domain.LocalRepository.LocalRepo
 import music.project.culo.FFMPEG.FFMPEGprocessor
 import music.project.culo.ForegroundService.ForegroundService
@@ -23,6 +17,7 @@ import music.project.culo.Utils.States
 import music.project.culo.Utils.ForegroundIntentExtras
 import music.project.culo.Utils.MusicActions
 import music.project.culo.Utils.OutofRange
+import music.project.culo.Utils.convertSecondsToHMmSs
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,8 +52,8 @@ class AudioCuttingSceenViewModel @Inject constructor(private val localRepoImpl :
 
     fun calculateRange(currentTimeMs : Long,totalTimeMs : Long,context: Context){
         if ((currentTimeMs + 30000) <= totalTimeMs) {
-            val startRange = SongManager.formatCurrentTime(currentTimeMs)
-            val endRange = SongManager.formatCurrentTime(currentTimeMs + 30000)
+            val startRange = convertSecondsToHMmSs(currentTimeMs)
+            val endRange = convertSecondsToHMmSs(currentTimeMs + 30000)
 
             val string = "Current Range- $startRange to $endRange (30secs)"
             _range.value = string

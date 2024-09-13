@@ -2,8 +2,6 @@ package music.project.culo.Presentation.HomeScreen
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,27 +9,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import music.project.culo.CuloApp
-import music.project.culo.Data.LocalRepositoryImpl.LocalRepoImpl
-import music.project.culo.Data.Room.Database
 import music.project.culo.Domain.LocalRepository.LocalRepo
 import music.project.culo.Domain.MergeLocalAndRoomSOngs.MergeRoomAndLocal
 import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Domain.Model.Post
 import music.project.culo.Domain.Model.Song
-import music.project.culo.Domain.Model.Songs
 import music.project.culo.ForegroundService.ForegroundService
-import music.project.culo.SongManager.SongManager
-import music.project.culo.Utils.EventBus
-import music.project.culo.Utils.ForegroundIntentExtras
 import music.project.culo.Utils.MusicActions
 import music.project.culo.Utils.PlaylistProvider
-import music.project.culo.Utils.States
-import music.project.culo.Utils.audioMMIMETYPE
-import java.io.Serializable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,10 +42,9 @@ class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRe
     }
 
     fun getSongs(context : Context){
-
         viewModelScope.launch(Dispatchers.IO) {
 
-            MergeRoomAndLocal(context){modifiedList ->
+            MergeRoomAndLocal(context,localRepoImpl){modifiedList ->
                 _songlist.value = modifiedList
             }
         }

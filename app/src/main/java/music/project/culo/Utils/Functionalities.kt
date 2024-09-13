@@ -4,37 +4,23 @@ import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
-import android.view.Display.Mode
-import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.NavHostController
-import com.arthenica.ffmpegkit.FFmpegKit
-import com.arthenica.ffmpegkit.FFmpegKit.executeWithArgumentsAsync
-import com.arthenica.ffmpegkit.FFmpegKitConfig
-import com.arthenica.ffmpegkit.ReturnCode
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import music.project.culo.CuloApp
-import music.project.culo.Data.LocalRepositoryImpl.LocalRepoImpl
+import music.project.culo.Data.local.LocalRepoImpl
 import music.project.culo.Domain.Model.Playlist
-import music.project.culo.Domain.Model.Post
 import music.project.culo.Domain.Model.Song
 import music.project.culo.Domain.Model.Songs
 import music.project.culo.ForegroundService.ForegroundService
 import music.project.culo.Presentation.Routes
 import java.io.File
-import java.net.URLDecoder
 import java.util.concurrent.TimeUnit
 
 
@@ -263,7 +249,7 @@ fun getArt(id : String) : Uri? {
 //    return filePath!!
 //}
 
-private fun convertSecondsToHMmSs(miliSeconds: Long): String {
+ fun convertSecondsToHMmSs(miliSeconds: Long): String {
     val hours = TimeUnit.MILLISECONDS.toHours(miliSeconds).toInt() % 24
     val minutes = TimeUnit.MILLISECONDS.toMinutes(miliSeconds).toInt() % 60
     val seconds = TimeUnit.MILLISECONDS.toSeconds(miliSeconds).toInt() % 60

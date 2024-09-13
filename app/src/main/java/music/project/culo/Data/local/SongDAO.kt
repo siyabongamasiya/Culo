@@ -1,4 +1,4 @@
-package music.project.culo.Data.Room
+package music.project.culo.Data.local
 
 import androidx.room.Dao
 import androidx.room.Delete

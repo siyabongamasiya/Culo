@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import music.project.culo.Data.LocalRepositoryImpl.LocalRepoImpl
+import music.project.culo.Data.local.LocalRepoImpl
 import music.project.culo.Domain.Model.Playlist
 
 object PlaylistProvider{
