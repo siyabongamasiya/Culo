@@ -48,6 +48,8 @@ val iconSize = 30
 val songOperatorsize = 80
 val playlistsurfaceSize = 120
 
+val ERROR = "Something went wrong!!"
+
 
 val Instruction = "*Select 30 seconds Range for audio below*"
 val OutofRange = "Out of Song Range!!"

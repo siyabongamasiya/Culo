@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -91,9 +92,9 @@ fun AppNavHost(navController: NavHostController){
     val postDetailsScreenViewModel = ViewmodelFactory.createViewModel(type = POST_DETAILS_SCREEN_VIEWMODEL)
     val postViewerViewModel =  ViewmodelFactory.createViewModel(type = POST_VIEWER_SCREEN_VIEWMODEL)
 
-    NavHost(navController = navController, startDestination = "Home"){
+    NavHost(navController = navController, startDestination = Routes.Homescreen){
 
-        composable("Home") {
+        composable<Routes.Homescreen> {
             HomeScreen(navController,homeScreenViewModel!! as HomeScreenViewModel)
         }
 

@@ -17,6 +17,7 @@ import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Domain.Model.Post
 import music.project.culo.Domain.Model.Song
 import music.project.culo.ForegroundService.ForegroundService
+import music.project.culo.Utils.ERROR
 import music.project.culo.Utils.MusicActions
 import music.project.culo.Utils.PlaylistProvider
 import javax.inject.Inject
@@ -33,31 +34,43 @@ class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRe
 
 
     fun collectPosts(context: Context){
-
-        viewModelScope.launch {
-            localRepoImpl.getPostsFromRoom(context).collect{posts ->
-                _postlist.value = posts.toMutableSet()
+        try {
+            viewModelScope.launch {
+                localRepoImpl.getPostsFromRoom(context).collect { posts ->
+                    _postlist.value = posts.toMutableSet()
+                }
             }
+        }catch(e : Exception){
+            Toast.makeText(context,ERROR,Toast.LENGTH_SHORT).show()
         }
     }
 
     fun getSongs(context : Context){
-        viewModelScope.launch(Dispatchers.IO) {
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
 
-            MergeRoomAndLocal(context,localRepoImpl){modifiedList ->
-                _songlist.value = modifiedList
+                MergeRoomAndLocal(context, localRepoImpl) { modifiedList ->
+                    _songlist.value = modifiedList
+                }
             }
+        }catch(e : Exception){
+            Toast.makeText(context,ERROR,Toast.LENGTH_SHORT).show()
         }
     }
 
     fun pauseplayCurrentSong(context: Context){
-        Intent(context,ForegroundService :: class.java).also {intent ->
-            intent.action = MusicActions.pauseplay.toString()
-            context.startForegroundService(intent)
+        try {
+            Intent(context, ForegroundService::class.java).also { intent ->
+                intent.action = MusicActions.pauseplay.toString()
+                context.startForegroundService(intent)
+            }
+        }catch(e : Exception){
+            Toast.makeText(context,ERROR,Toast.LENGTH_SHORT).show()
         }
     }
 
     fun findIndexOfFirstItem(letter : String) : Int{
+
         var finalindex  = 0
         val sortedlist = _songlist.value.sortedBy {song ->
             song.title
@@ -76,13 +89,17 @@ class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRe
     }
 
     fun deletePost(context: Context,post: Post){
-        viewModelScope.launch(Dispatchers.IO) {
-            localRepoImpl.deletePost(context,post)
-            collectPosts(context)
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                localRepoImpl.deletePost(context, post)
+                collectPosts(context)
 
-            withContext(Dispatchers.Main){
-                Toast.makeText(context,"Done!!",Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Done!!", Toast.LENGTH_SHORT).show()
+                }
             }
+        }catch(e : Exception){
+            Toast.makeText(context,ERROR,Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -90,22 +107,34 @@ class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRe
 
 
     fun addPlaylist(playlist: Playlist,context: Context){
-        viewModelScope.launch(Dispatchers.IO) {
-            localRepoImpl.savePlaylist(context,playlist)
-            PlaylistProvider.collectPlaylists(context)
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                localRepoImpl.savePlaylist(context, playlist)
+                PlaylistProvider.collectPlaylists(context)
+            }
+        }catch(e : Exception){
+            Toast.makeText(context,ERROR,Toast.LENGTH_SHORT).show()
         }
     }
 
     fun deletePlaylist(context: Context,playlist: Playlist){
-        viewModelScope.launch(Dispatchers.IO) {
-            localRepoImpl.deletePlaylist(context,playlist)
-            PlaylistProvider.collectPlaylists(context)
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                localRepoImpl.deletePlaylist(context, playlist)
+                PlaylistProvider.collectPlaylists(context)
+            }
+        }catch(e : Exception){
+            Toast.makeText(context,ERROR,Toast.LENGTH_SHORT).show()
         }
     }
 
     fun updatePlaylist(context: Context,playlist: Playlist){
-        viewModelScope.launch(Dispatchers.IO) {
-            localRepoImpl.updatePlaylist(context,playlist)
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                localRepoImpl.updatePlaylist(context, playlist)
+            }
+        }catch(e : Exception){
+            Toast.makeText(context, ERROR,Toast.LENGTH_SHORT).show()
         }
     }
 
