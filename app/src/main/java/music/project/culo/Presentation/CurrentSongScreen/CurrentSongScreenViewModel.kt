@@ -9,7 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import music.project.culo.Domain.LocalRepository.LocalRepo
-import music.project.culo.Domain.MergeLocalAndRoomSOngs.MergeRoomAndLocal
+import music.project.culo.Domain.MergeLocalAndRoomSOngs.GetSongs
 import music.project.culo.Domain.Model.Song
 import music.project.culo.ForegroundService.ForegroundService
 import music.project.culo.Utils.ERROR
@@ -18,14 +18,14 @@ import music.project.culo.Utils.MusicActions
 import javax.inject.Inject
 
 @HiltViewModel
-class CurrentSongScreenViewModel @Inject constructor(val localRepo: LocalRepo): ViewModel() {
+class CurrentSongScreenViewModel @Inject constructor(val localRepo: LocalRepo,val getSongs: GetSongs): ViewModel() {
     private lateinit var songlist : List<Song>
 
     fun getSongs(context: Context){
         try {
             viewModelScope.launch(Dispatchers.IO) {
-                MergeRoomAndLocal(context, localRepo) { modifiedList ->
-                    songlist = modifiedList
+                getSongs.invoke(context){ updatedList ->
+                    songlist = updatedList
                 }
             }
         }catch(e : Exception){

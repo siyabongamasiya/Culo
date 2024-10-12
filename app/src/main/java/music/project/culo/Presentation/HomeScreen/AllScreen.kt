@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -110,10 +111,6 @@ fun midSectionAll(
         song.getSearchText().contains(searchedText.value,true)
     }
 
-    val sortedlist = filteredList.sortedBy {song ->
-        song.title
-    }
-
     LaunchedEffect(key1 = Unit) {
         homeScreenViewModel.getSongs(context)
     }
@@ -172,15 +169,18 @@ fun midSectionAll(
             )
 
             //divider
-            Divider(modifier = Modifier
-                .fillMaxWidth()
-                .height(2.dp),
-                color = Color.Black)
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp),
+                color = Color.Black
+            )
 
             //List of songs
             Songlist(modifier = Modifier
                 .weight(0.8f)
-                .fillMaxWidth(), songlist = sortedlist,
+                .fillMaxWidth(),
+                songlist = filteredList,
                 navController = navController,
                 onShowOptions = {isPlaylist,song ->
                     showOptions.value = true

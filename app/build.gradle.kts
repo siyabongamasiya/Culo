@@ -99,8 +99,10 @@ dependencies {
 
     //turbine for ing flows
     implementation("app.cash.turbine:turbine:1.1.0")
+
     testImplementation(libs.junit)
     testImplementation("com.google.truth:truth:1.0.1")
+
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
     androidTestImplementation("com.google.truth:truth:1.0.1")
     androidTestImplementation(libs.androidx.junit)

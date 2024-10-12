@@ -78,9 +78,13 @@ fun midSectionMostPlayed(
     val songList = homeScreenViewModel.songlist.collectAsState()
     val context = LocalContext.current
 
-    val filteredList = songList.value.sortedBy { song ->
-        song.plays
-    }
+    val filteredList = songList.value
+        .filter { song ->
+            song.plays > 0
+        }
+        .sortedBy { song ->
+            song.plays
+        }
 
     Box(modifier = Modifier
         .fillMaxSize()

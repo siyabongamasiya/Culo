@@ -5,6 +5,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,18 +13,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import music.project.culo.Domain.LocalRepository.LocalRepo
-import music.project.culo.Domain.MergeLocalAndRoomSOngs.MergeRoomAndLocal
+import music.project.culo.Domain.MergeLocalAndRoomSOngs.GetSongs
 import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Domain.Model.Post
 import music.project.culo.Domain.Model.Song
+import music.project.culo.Domain.Model.Songs
 import music.project.culo.ForegroundService.ForegroundService
+import music.project.culo.Presentation.Routes
+import music.project.culo.SongManager.SongManager
 import music.project.culo.Utils.ERROR
 import music.project.culo.Utils.MusicActions
 import music.project.culo.Utils.PlaylistProvider
+import music.project.culo.Utils.StartSong
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRepo): ViewModel() {
+class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRepo,private val getSongs: GetSongs): ViewModel() {
     private var _songlist = MutableStateFlow<List<Song>>(emptyList())
     val songlist = _songlist.asStateFlow()
 
@@ -49,7 +54,7 @@ class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRe
         try {
             viewModelScope.launch(Dispatchers.IO) {
 
-                MergeRoomAndLocal(context, localRepoImpl) { modifiedList ->
+                getSongs.invoke(context){ modifiedList ->
                     _songlist.value = modifiedList
                 }
             }
@@ -135,6 +140,17 @@ class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRe
             }
         }catch(e : Exception){
             Toast.makeText(context, ERROR,Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun startSong(isSameSong : Boolean,
+                 navController: NavHostController,
+                 song: Song, context: Context){
+        if (isSameSong){
+            navController.navigate(Routes.CurrentSongScreen())
+        }else{
+            navController.navigate(Routes.CurrentSongScreen())
+            StartSong(song,context,songlist.value)
         }
     }
 

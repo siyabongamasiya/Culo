@@ -2,11 +2,13 @@ package music.project.culo.di
 
 import android.content.Context
 import androidx.media3.exoplayer.ExoPlayer
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 import music.project.culo.CuloApp
 import music.project.culo.Data.local.LocalRepoImpl
 import music.project.culo.Domain.LocalRepository.LocalRepo
@@ -43,15 +45,5 @@ object AppModule {
     @Singleton
     fun ProvideExoplayer(appContext : CuloApp) : ExoPlayer {
         return ExoPlayer.Builder(appContext).build()
-    }
-
-
-    @Provides
-    @Singleton
-    fun ProvideSongManager(exoPlayer: ExoPlayer,
-                           localRepo: LocalRepo,
-                           app: CuloApp
-    ) : SongManager {
-        return SongManager(exoPlayer = exoPlayer, localrepo = localRepo, context = app)
     }
 }

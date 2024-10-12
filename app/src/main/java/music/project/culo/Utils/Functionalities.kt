@@ -302,21 +302,14 @@ fun findPlaylistbyname(playlists : List<Playlist>, name : String) : Playlist {
 }
 
 fun StartSong(song: Song,context: Context,songlist : List<Song>){
-    Intent(context,ForegroundService :: class.java).also {intent ->
+    Intent(context, ForegroundService::class.java).also { intent ->
         intent.action = MusicActions.start.toString()
         intent.putExtra(ForegroundIntentExtras.LIST.toString(), Songs(songlist))
-        intent.putExtra(ForegroundIntentExtras.ID.toString(),song.url)
+        intent.putExtra(ForegroundIntentExtras.ID.toString(), song.url)
         context.startForegroundService(intent)
     }
 }
-fun Navigate(isSameSong : Boolean,navController: NavHostController,song: Song,context: Context,songlist: List<Song>){
-    if (isSameSong){
-        navController.navigate(Routes.CurrentSongScreen())
-    }else{
-        navController.navigate(Routes.CurrentSongScreen())
-        StartSong(song,context,songlist)
-    }
-}
+
 
 fun likeSong(likedsong: Song, context: Context){
     likedsong.liked = !likedsong.liked

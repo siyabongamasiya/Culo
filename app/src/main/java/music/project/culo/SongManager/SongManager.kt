@@ -1,27 +1,37 @@
 package music.project.culo.SongManager
 
+import android.content.Context
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import music.project.culo.CuloApp
 import music.project.culo.Domain.LocalRepository.LocalRepo
+import music.project.culo.Domain.MergeLocalAndRoomSOngs.GetSongs
 import music.project.culo.Domain.Model.Song
 import music.project.culo.Domain.Model.Songs
 import music.project.culo.Utils.SongManager
 import music.project.culo.Utils.getPlayMode
 import music.project.culo.Utils.savedPlayMode
+import javax.inject.Inject
 
-class SongManager(val exoPlayer: ExoPlayer,
-                  val localrepo: LocalRepo,
-                  val context: CuloApp) {
+class SongManager @Inject constructor(val exoPlayer: ExoPlayer,
+                                      val localrepo: LocalRepo,
+                                      val getSongs: GetSongs,
+                                      val context: CuloApp) {
 
-    lateinit var songList: List<Song>
+    var songList: List<Song> = emptyList()
     var queue : MutableList<Song> = mutableListOf()
     var showNotification : (song : Song) -> Unit = {}
     private var currentSong = Song()
+
+    init {
+        getSongs()
+    }
 
 
 
@@ -32,9 +42,18 @@ class SongManager(val exoPlayer: ExoPlayer,
         this.showNotification = notifier
     }
 
+    fun getSongs(){
+        CoroutineScope(Dispatchers.IO).launch {
+            getSongs.invoke(context){updatedsongs ->
+                songList = updatedsongs
+            }
+        }
+    }
+
 
 
     fun startSong(url : String) : Song{
+        //create media items
         val mediaitems = songList.let { list ->
             val mediaItems : MutableList<MediaItem> = mutableListOf()
             list.forEach { song ->
@@ -44,6 +63,7 @@ class SongManager(val exoPlayer: ExoPlayer,
             mediaItems
         }
 
+        //search for index of initial song
         var initialPosition = 0
         songList.forEachIndexed {index,song ->
             if (song.url == url){
@@ -51,6 +71,7 @@ class SongManager(val exoPlayer: ExoPlayer,
             }
         }
 
+        //create listener for playback state
         val listener = object : Player.Listener{
 
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -86,6 +107,7 @@ class SongManager(val exoPlayer: ExoPlayer,
             }
         }
 
+        //set exoplayer configuration
         with(exoPlayer){
             setMediaItems(mediaitems)
             addListener(listener)
@@ -101,6 +123,7 @@ class SongManager(val exoPlayer: ExoPlayer,
             play()
         }
 
+        //start song,increase number of plays and update UI
         val startsong = songList[initialPosition]
         currentSong = startsong
         increasePlays(currentSong)
@@ -118,6 +141,7 @@ class SongManager(val exoPlayer: ExoPlayer,
 
     private fun increasePlays(song: Song){
         val coroutineScope = CoroutineScope(Dispatchers.IO)
+        //put it on top in recent plays
         topIt(song)
 
 
@@ -125,15 +149,16 @@ class SongManager(val exoPlayer: ExoPlayer,
 
         song.plays++
         coroutineScope.launch {
+            //save song with increased plays
             localrepo.saveSong(context,song)
+            //save new adjusted recents playlist
             if (SongManager.recentplays.songs.songList.size == 1) {
                 localrepo.savePlaylist(context, savableplaylist)
-                //Log.d("tag", "${recentplays.songs.songList.size} none")
             }else{
                 localrepo.updatePlaylist(context, savableplaylist)
-                //Log.d("tag", "${recentplays.songs.songList.size} some")
             }
-            //Log.d("tag", "${recentplays.songs.songList.size} items 3")
+
+            getSongs()
         }
     }
 
@@ -234,8 +259,10 @@ class SongManager(val exoPlayer: ExoPlayer,
         return songList[index]
     }
 
-    fun setSongs(songs: Songs){
-        songList = songs.songList
+    fun setInitialSongs(songs: Songs){
+        if (songList.isEmpty()) {
+            songList = songs.songList
+        }
     }
 
     fun isPlaying() : Boolean{

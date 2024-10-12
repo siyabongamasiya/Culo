@@ -76,7 +76,6 @@ import music.project.culo.Presentation.PlaylistListScreen.PlaylistListViewModel
 import music.project.culo.Presentation.Routes
 import music.project.culo.R
 import music.project.culo.Utils.SongManager
-import music.project.culo.Utils.Navigate
 import music.project.culo.Utils.PlaylistProvider
 import music.project.culo.Utils.QueueSong
 import music.project.culo.Utils.SongOptions
@@ -256,11 +255,11 @@ fun Songlist(modifier: Modifier,
                     , OnShowOptions = {isAplaylist,providedSong ->
                         onShowOptions.invoke(isplaylist,providedSong)
                     }, onclick = {
-                        Navigate(currentSongDetails.value.currentSong.url == song.url,
+                        ScreenViewModel.startSong(
+                            currentSongDetails.value.currentSong.url == song.url,
                             navController,
                             song,
-                            context,
-                            songlist)
+                            context)
                     })
             }
         }
@@ -279,11 +278,11 @@ fun Songlist(modifier: Modifier,
                     , OnShowOptions = {isAplaylist,providedSong ->
                         onShowOptions.invoke(isAplaylist,providedSong)
                     }, onclick = {
-                        Navigate(currentSongDetails.value.currentSong.url == song.url,
+                        ScreenViewModel.startSong(
+                            currentSongDetails.value.currentSong.url == song.url,
                             navController,
                             song,
-                            context,
-                            songlist)
+                            context)
                     })
             }
         }

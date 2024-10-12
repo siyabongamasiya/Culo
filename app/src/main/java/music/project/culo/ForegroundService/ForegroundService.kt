@@ -41,6 +41,11 @@ class ForegroundService : Service() {
 
     @Inject
     lateinit var songManager: SongManager
+
+    private val started = false
+
+
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -57,10 +62,12 @@ class ForegroundService : Service() {
             MusicActions.start.toString() -> {
                 val scope = CoroutineScope(Dispatchers.Main)
                 val initialSongUrl = intent.getStringExtra(ForegroundIntentExtras.ID.toString())
-                val songs = intent.getParcelableExtra<Songs>(ForegroundIntentExtras.LIST.toString()) as Songs
+                val songs = intent.getParcelableExtra<Songs>(ForegroundIntentExtras.LIST.toString())
 
+                if (songs != null) {
+                    songManager.setInitialSongs(songs)
+                }
 
-                songManager.setSongs(songs)
                 startForeground(NOTIFICATION_ID,createNotification(songManager.startSong(initialSongUrl!!)))
                 scope.launch {
                     while (true){

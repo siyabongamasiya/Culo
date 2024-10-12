@@ -1,7 +1,6 @@
 package music.project.culo.Utils
 
 import com.google.common.truth.Truth
-import org.junit.Assert.*
 import org.junit.Test
 
 class FunctionalitiesKtTest{

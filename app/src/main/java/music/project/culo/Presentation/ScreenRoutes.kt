@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class Routes{
     @Serializable
-    object Homescreen : Routes()
+    object Homescreen 
 
     @Serializable
     data class CurrentSongScreen(
