@@ -97,8 +97,11 @@ dependencies {
     implementation("com.arthenica:ffmpeg-kit-full-gpl:4.5.1-1")
     //implementation("com.arthenica:mobile-ffmpeg-full:4.4")
 
-    //turbine for ing flows
+    //turbine for testing flows
     implementation("app.cash.turbine:turbine:1.1.0")
+
+    //project
+    implementation(project(":flow-extensions"))
 
     testImplementation(libs.junit)
     testImplementation("com.google.truth:truth:1.0.1")
@@ -112,7 +115,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
+    kaptAndroidTest(libs.dagger.hilt.android.compiler)
 }
 
 // Allow references to generated code

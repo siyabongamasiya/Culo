@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Culo"
 include(":app")
- 
+include(":flow-extensions")

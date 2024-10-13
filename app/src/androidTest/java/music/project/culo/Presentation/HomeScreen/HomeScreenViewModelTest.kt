@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import music.project.culo.Data.local.FakeLocalRepo
+import music.project.culo.Domain.MergeLocalAndRoomSOngs.GetSongs
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -31,7 +32,7 @@ class HomeScreenViewModelTest{
     @Before
     fun setUp(){
         fakeLocalRepo = FakeLocalRepo()
-        homeScreenViewModel = HomeScreenViewModel(fakeLocalRepo)
+        homeScreenViewModel = HomeScreenViewModel(fakeLocalRepo, GetSongs(fakeLocalRepo))
         context = ApplicationProvider.getApplicationContext()
         Dispatchers.setMain(testDispatcher)
     }

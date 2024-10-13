@@ -5,6 +5,7 @@ coil = "2.7.0"
 compose = "1.0.0-beta01"
 constraintlayoutCompose = "1.0.1"
 gson = "2.11.0"
+hiltAndroidCompilerVersion = "2.51.1"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -23,6 +24,8 @@ roomRuntime = "2.6.1"
 roomVersion = "2.6.1"
 serialization ="1.6.3"
 uiTextGoogleFonts = "1.7.2"
+appcompat = "1.7.0"
+material = "1.12.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -43,6 +46,7 @@ coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 coil-video = { module = "io.coil-kt:coil-video", version.ref = "coil" }
 compose = { module = "com.github.bumptech.glide:compose", version.ref = "compose" }
+dagger-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompilerVersion" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -59,9 +63,12 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 navigation-compose = {module = "androidx.navigation:navigation-compose",version.ref ="composeNavigation"}
 kotlinx-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json",version.ref = "serialization"}
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization ={id ="org.jetbrains.kotlin.plugin.serialization",version.ref = "kotlin"}
+android-library = { id = "com.android.library", version.ref = "agp" }
 

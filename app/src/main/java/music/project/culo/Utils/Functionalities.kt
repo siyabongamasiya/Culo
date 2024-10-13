@@ -8,7 +8,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +18,6 @@ import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Domain.Model.Song
 import music.project.culo.Domain.Model.Songs
 import music.project.culo.ForegroundService.ForegroundService
-import music.project.culo.Presentation.Routes
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -340,8 +338,12 @@ fun ShareSong(song: Song,context: Context){
         putExtra(Intent.EXTRA_COMPONENT_NAME,song.title)
     }
 
+
+
     context.startActivity(Intent.createChooser(intent,null))
+
 }
+
 
 
 

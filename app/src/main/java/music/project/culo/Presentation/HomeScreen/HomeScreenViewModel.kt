@@ -36,8 +36,6 @@ class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRe
     val postlist = _postlist.asStateFlow()
 
 
-
-
     fun collectPosts(context: Context){
         try {
             viewModelScope.launch {
@@ -53,7 +51,6 @@ class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRe
     fun getSongs(context : Context){
         try {
             viewModelScope.launch(Dispatchers.IO) {
-
                 getSongs.invoke(context){ modifiedList ->
                     _songlist.value = modifiedList
                 }
