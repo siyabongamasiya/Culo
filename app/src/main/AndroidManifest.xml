@@ -11,6 +11,8 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_CALL_LOG"/>
 
     <application
         android:name=".CuloApp"
@@ -23,6 +25,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Culo"
         tools:targetApi="31">
+
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-4493140136275030~8150032960"/>
+
+
+
         <activity
             android:name=".Presentation.MainActivity"
             android:exported="true"
@@ -34,6 +44,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name=".PhoneCallReceiver.PhoneCallReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE"/>
+            </intent-filter>
+        </receiver>
         <service android:name=".ForegroundService.ForegroundService"
             android:foregroundServiceType="mediaPlayback"/>
     </application>

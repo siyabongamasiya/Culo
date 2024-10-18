@@ -90,6 +90,14 @@ class ForegroundService : Service() {
                 }
             }
 
+            MusicActions.stop.toString() -> {
+                try {
+                    startForeground(NOTIFICATION_ID, createNotification(songManager.pause()))
+                }catch (exception : Exception){
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                }
+            }
+
             MusicActions.next.toString() -> {
                 try {
                     startForeground(NOTIFICATION_ID, createNotification(songManager.playNextSong()))

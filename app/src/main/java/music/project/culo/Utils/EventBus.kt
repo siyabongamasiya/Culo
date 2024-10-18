@@ -1,13 +1,16 @@
 package music.project.culo.Utils
 
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 object EventBus {
-    private var _state = MutableSharedFlow<String>()
-    val state = _state.asSharedFlow()
+    private var _state = MutableStateFlow(States.INPROGRESS.toString())
+    val state = _state.asStateFlow()
 
-    suspend fun updateState(currentState : String){
-        _state.emit(currentState)
+    fun updateState(currentState : String){
+        _state.value = currentState
     }
 }

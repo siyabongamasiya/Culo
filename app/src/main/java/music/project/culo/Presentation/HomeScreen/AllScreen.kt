@@ -44,9 +44,11 @@ import music.project.culo.Presentation.Components.customButton
 import music.project.culo.Presentation.Components.options
 import music.project.culo.Presentation.Components.playlist
 import music.project.culo.Presentation.Routes
+import music.project.culo.Utils.EventBus
 import music.project.culo.Utils.PlaylistProvider
 import music.project.culo.Utils.QueueSong
 import music.project.culo.Utils.ShareSong
+import music.project.culo.Utils.States
 import music.project.culo.Utils.TestTags
 import music.project.culo.Utils.likeSong
 
@@ -107,9 +109,13 @@ fun midSectionAll(
     val songList = homeScreenViewModel.songlist.collectAsState()
     val coroutine = rememberCoroutineScope()
 
-    val filteredList = songList.value.filter { song ->
-        song.getSearchText().contains(searchedText.value,true)
-    }
+    val filteredList = songList.value
+        .sortedBy { song ->
+            song.title
+        }
+        .filter { song ->
+            song.getSearchText().contains(searchedText.value,true)
+        }
 
     LaunchedEffect(key1 = Unit) {
         homeScreenViewModel.getSongs(context)

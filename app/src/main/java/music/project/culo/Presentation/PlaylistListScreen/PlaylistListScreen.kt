@@ -243,10 +243,6 @@ fun DrawOtherList(paddingValues: PaddingValues,
         mutableStateOf(Song())
     }
 
-    val selectedCategory = rememberSaveable {
-        mutableStateOf("A")
-    }
-
     val showSearchEditor = rememberSaveable {
         mutableStateOf(false)
     }
@@ -268,8 +264,6 @@ fun DrawOtherList(paddingValues: PaddingValues,
     }
 
     val scrollstate = rememberLazyListState()
-
-    val coroutine = rememberCoroutineScope()
 
     val context = LocalContext.current
 

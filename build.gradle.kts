@@ -7,3 +7,4 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.51.1" apply false
     alias(libs.plugins.android.library) apply false
 }
+

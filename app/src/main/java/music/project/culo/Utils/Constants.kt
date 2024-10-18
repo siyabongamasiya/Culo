@@ -86,7 +86,8 @@ enum class MusicActions{
     previous,
     seekto,
     shuffle,
-    queue
+    queue,
+    stop
 }
 
 enum class ChannelDetails(val string : String){

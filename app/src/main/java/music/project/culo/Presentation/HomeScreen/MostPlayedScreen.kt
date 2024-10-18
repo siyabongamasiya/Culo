@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -48,6 +49,13 @@ fun MostPlayedScreen(
     navController: NavHostController,
     homeScreenViewModel: HomeScreenViewModel
 ){
+
+    val context = LocalContext.current
+    LaunchedEffect(key1 = Unit) {
+        homeScreenViewModel.getSongs(context)
+    }
+
+
     Scaffold {paddingValues ->
         midSectionMostPlayed(paddingValues = paddingValues,navController,homeScreenViewModel)
     }

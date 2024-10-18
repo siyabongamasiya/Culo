@@ -24,6 +24,29 @@ android {
         }
     }
 
+    flavorDimensions += listOf("advertised","pausable")
+    productFlavors {
+        create("with_ads"){
+            dimension = "advertised"
+            applicationIdSuffix = ".no_adv"
+        }
+
+        create("without_ads"){
+            dimension = "advertised"
+            applicationIdSuffix = ".adv"
+        }
+
+        create("pausable"){
+            dimension = "pausable"
+            applicationIdSuffix = ".pause"
+        }
+
+        create("not_pausable"){
+            dimension = "pausable"
+            applicationIdSuffix = ".not_pause"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -55,6 +78,24 @@ android {
     }
 }
 
+androidComponents{
+    beforeVariants {builder ->
+        builder.productFlavors.forEach {pair ->
+            if (builder.buildType == "release"){
+                if(pair.second == "without_ads" || pair.second == "not_pausable") {
+                    builder.enable = false
+                }
+            }
+
+            if (builder.buildType == "debug"){
+                if(pair.second == "with_ads" || pair.second == "pausable") {
+                    builder.enable = false
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -77,6 +118,8 @@ dependencies {
 
     implementation(libs.coil.compose)
     implementation(libs.coil.video)
+    //admob
+    implementation("com.google.android.gms:play-services-ads:23.3.0")
 
     //Dagger - Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
@@ -100,8 +143,7 @@ dependencies {
     //turbine for testing flows
     implementation("app.cash.turbine:turbine:1.1.0")
 
-    //project
-    implementation(project(":flow-extensions"))
+    implementation ("com.github.siyabongamasiya:Culo:1.0.0")
 
     testImplementation(libs.junit)
     testImplementation("com.google.truth:truth:1.0.1")
@@ -122,3 +164,15 @@ dependencies {
 kapt {
     correctErrorTypes = true
 }
+
+
+task("hello world"){
+    doFirst {
+        println("my first gradle task in the beginning")
+    }
+
+    doLast {
+        println("my first gradle task in the end")
+    }
+}
+

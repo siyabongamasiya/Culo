@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.app.ActivityOptionsCompat
@@ -68,6 +69,9 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import kotlinx.coroutines.launch
 import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Domain.Model.Song
@@ -416,6 +420,7 @@ fun categorizer(selectedCategory : String,
 @Composable
 fun requestPermission(content : @Composable()() -> Unit){
     val context = LocalContext.current
+    val phonestatepemission = rememberPermissionState(permission = android.Manifest.permission.READ_PHONE_STATE)
     val audioreadpermission = rememberPermissionState(permission = android.Manifest.permission.READ_EXTERNAL_STORAGE)
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -432,7 +437,15 @@ fun requestPermission(content : @Composable()() -> Unit){
         }
     }
 
-    if (audioreadpermission.status.isGranted){
+    LaunchedEffect(key1 = phonestatepemission) {
+        if (!phonestatepemission.status.isGranted){
+            requestPermissionLauncher.launch(android.Manifest.permission.READ_PHONE_STATE)
+        }
+    }
+
+
+
+    if (audioreadpermission.status.isGranted && phonestatepemission.status.isGranted){
         content.invoke()
     }else{
         Box(modifier = Modifier.fillMaxSize()){
@@ -455,6 +468,7 @@ fun ShowFiles(onChooseFile : (uriparam : Uri) -> Unit){
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun bottomSectionHome(currentSong: Song,viewModel: ViewModel,onclick : ()  -> Unit){
     val context = LocalContext.current
@@ -467,13 +481,21 @@ fun bottomSectionHome(currentSong: Song,viewModel: ViewModel,onclick : ()  -> Un
             .clickable { onclick.invoke() }
             .background(MaterialTheme.colorScheme.surface)
             .padding(10.dp)) {
-        Icon(painter = painterResource(id = R.drawable.logoimage),
+
+
+        val url = getArt(currentSongDetails.value.currentSong.id)
+        GlideImage(
             contentDescription = "pic",
             modifier = Modifier
                 .width(50.dp)
                 .height(50.dp)
                 .weight(0.2f)
-                .clip(RoundedCornerShape(50)))
+                .clip(RoundedCornerShape(50)),
+            model = url,
+            failure = placeholder(R.drawable.logoimage),
+            contentScale = ContentScale.Crop
+        )
+
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .weight(0.6f)){
@@ -529,4 +551,24 @@ fun requestImages(navController: NavHostController,currentTime : Long,onFinish :
     }
 
 
+}
+
+@Composable
+fun AdmobBanner(modifier: Modifier = Modifier) {
+    AndroidView(
+        modifier = modifier.fillMaxWidth(),
+        factory = { context ->
+            // on below line specifying ad view.
+            AdView(context).apply {
+                // on below line specifying ad size
+                //adSize = AdSize.BANNER
+                // on below line specifying ad unit id
+                // currently added a test ad unit id.
+                setAdSize(AdSize.BANNER)
+                adUnitId ="ca-app-pub-4493140136275030/6200363334" //"ca-app-pub-3940256099942544/9214589741"
+                // calling load ad to load our ad.
+                //loadAd(AdRequest.Builder().build())
+            }
+        }
+    )
 }

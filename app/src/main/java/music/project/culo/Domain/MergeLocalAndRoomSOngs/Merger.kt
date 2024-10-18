@@ -26,10 +26,7 @@ class GetSongs @Inject constructor(private val localRepo: LocalRepo){
                 }
             }
 
-            val sortedlist = localsongs.sortedBy {song ->
-                song.title
-            }
-            sortedlist
+            localsongs
         }.collect{updatedsongs ->
             update.invoke(updatedsongs)
         }

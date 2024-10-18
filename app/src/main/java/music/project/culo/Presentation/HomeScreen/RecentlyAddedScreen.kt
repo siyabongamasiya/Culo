@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,6 +38,11 @@ fun RecentleyAddedScreen(
     navController: NavHostController,
     homeScreenViewModel: HomeScreenViewModel
 ){
+    val context = LocalContext.current
+    LaunchedEffect(key1 = Unit) {
+        homeScreenViewModel.getSongs(context)
+    }
+
     Scaffold {paddingValues ->
         midSectionRecentleyAdded(paddingValues = paddingValues,navController,homeScreenViewModel)
     }

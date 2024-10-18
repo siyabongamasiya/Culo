@@ -44,6 +44,11 @@ fun RecentleyPlayedScreen(
     navController: NavHostController,
     homeScreenViewModel: HomeScreenViewModel
 ){
+    val context = LocalContext.current
+    LaunchedEffect(key1 = Unit) {
+        homeScreenViewModel.getSongs(context)
+    }
+
     Scaffold {paddingValues ->
         midSectionRecentleyPlayed(paddingValues = paddingValues,navController,homeScreenViewModel)
     }

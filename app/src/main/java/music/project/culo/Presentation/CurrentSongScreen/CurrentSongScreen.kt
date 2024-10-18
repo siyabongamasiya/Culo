@@ -66,6 +66,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import music.project.culo.Domain.Model.CurrentSongDetails
+import music.project.culo.Presentation.Components.AdmobBanner
 import music.project.culo.Presentation.Components.customButton
 import music.project.culo.Presentation.Components.playlist
 import music.project.culo.Presentation.Components.requestImages
@@ -85,8 +87,13 @@ fun CurrentSongScreen(
 ){
     val context = LocalContext.current
     LaunchedEffect(key1 = Unit) {
-        currentSongScreenViewModel.getSongs(context)
+        if(SongManager.currentSongDetails.value != CurrentSongDetails()) {
+            currentSongScreenViewModel.getSongs(context)
+        }else{
+            navController.navigateUp()
+        }
     }
+
     Scaffold (topBar = {
         topSection(navController)
     }, modifier = Modifier.testTag(TestTags.CurrentSongScreen.tag),
@@ -138,7 +145,7 @@ fun topSection(navController: NavController,
                 .size(iconSize.dp)
                 .clickable {
                     navController.navigateUp()
-                    if (isAudioCutting){
+                    if (isAudioCutting) {
                         onAudioScreenBackPressed.invoke()
                     }
                 }
@@ -146,6 +153,7 @@ fun topSection(navController: NavController,
             tint = MaterialTheme.colorScheme.onSecondary,
             imageVector = Icons.Default.ArrowBack,
             contentDescription = "back")
+
 
 
 
@@ -410,6 +418,8 @@ fun midSectionCurrentSong(paddingValues: PaddingValues,
             .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(30.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
+
+            AdmobBanner()
 
             Icon(
                 modifier = Modifier

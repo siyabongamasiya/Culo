@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import media.project.flow_extensions.fetch
 import music.project.culo.Data.local.LocalRepoImpl
 import music.project.culo.Domain.Model.Playlist
 import music.project.culo.Domain.Model.Song
@@ -337,8 +338,6 @@ fun ShareSong(song: Song,context: Context){
         putExtra(Intent.EXTRA_STREAM,uri)
         putExtra(Intent.EXTRA_COMPONENT_NAME,song.title)
     }
-
-
 
     context.startActivity(Intent.createChooser(intent,null))
 

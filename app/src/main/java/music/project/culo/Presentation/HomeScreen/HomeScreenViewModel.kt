@@ -2,6 +2,7 @@ package music.project.culo.Presentation.HomeScreen
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,9 +23,11 @@ import music.project.culo.ForegroundService.ForegroundService
 import music.project.culo.Presentation.Routes
 import music.project.culo.SongManager.SongManager
 import music.project.culo.Utils.ERROR
+import music.project.culo.Utils.EventBus
 import music.project.culo.Utils.MusicActions
 import music.project.culo.Utils.PlaylistProvider
 import music.project.culo.Utils.StartSong
+import music.project.culo.Utils.States
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,6 +54,10 @@ class HomeScreenViewModel @Inject constructor(private val localRepoImpl: LocalRe
     fun getSongs(context : Context){
         try {
             viewModelScope.launch(Dispatchers.IO) {
+                withContext(Dispatchers.Main){
+                    EventBus.updateState(States.DONE_SUCCESS.toString())
+                }
+
                 getSongs.invoke(context){ modifiedList ->
                     _songlist.value = modifiedList
                 }

@@ -192,6 +192,16 @@ class SongManager @Inject constructor(val exoPlayer: ExoPlayer,
         return -1
     }
 
+    fun pause() : Song{
+        exoPlayer.pause()
+
+        val currentSong = songList[exoPlayer.currentMediaItemIndex]
+        SongManager.UpdateCurrentSong(exoPlayer.currentPosition,currentSong,exoPlayer.repeatMode,exoPlayer.isPlaying,exoPlayer.shuffleModeEnabled)
+
+        this.currentSong = currentSong
+        return currentSong
+    }
+
     fun playOrPause() : Song{
         if (exoPlayer.isPlaying){
             exoPlayer.pause()

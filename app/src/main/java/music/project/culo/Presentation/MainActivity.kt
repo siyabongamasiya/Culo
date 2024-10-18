@@ -1,6 +1,7 @@
 package music.project.culo.Presentation
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -48,33 +48,45 @@ import music.project.culo.ui.theme.CuloTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        val backgroundScope = CoroutineScope(Dispatchers.IO)
+//        backgroundScope.launch {
+//            // Initialize the Google Mobile Ads SDK on a background thread.
+//            MobileAds.initialize(this@MainActivity) {}
+//        }
         //enableEdgeToEdge()
         setContent {
             CuloTheme {
                 val context = LocalContext.current
                 val navController = rememberNavController()
 
-                val state = EventBus.state.collectAsStateWithLifecycle(initialValue = States.DONE_SUCCESS.toString())
-
-                if(state.value == States.DONE_SUCCESS.toString()) {
-                    AppNavHost(navController = navController)
-                }else if(state.value == States.INPROGRESS.toString()){
-                    AppNavHost(navController = navController)
-                    Box (modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Transparent)){
-
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center),
-                            color = MaterialTheme.colorScheme.surface
-                        )
-
+                val state = EventBus.state.collectAsStateWithLifecycle()
+                Log.d("load state", state.value)
+                when(state.value){
+                    States.DONE_SUCCESS.toString() ->{
+                        AppNavHost(navController = navController)
                     }
-                }else if(state.value == States.DONE_FAILED.toString()){
-                    AppNavHost(navController = navController)
-                    Toast.makeText(context, "Failed!!", Toast.LENGTH_SHORT).show()
+
+                    States.INPROGRESS.toString() -> {
+                        AppNavHost(navController = navController)
+                        Box (modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Transparent)){
+
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+
+                        }
+                    }
+
+                    States.DONE_FAILED.toString() -> {
+                        AppNavHost(navController = navController)
+                        Toast.makeText(context, "Failed!!", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
