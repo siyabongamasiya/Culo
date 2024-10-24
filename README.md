@@ -11,7 +11,7 @@ Skills Demonstrated
 
 3.Exoplayer
 
-4.Intergrating Ads with Admob \n
+4.Intergrating Ads with Admob 
 
 5.Dagger hilt
 
