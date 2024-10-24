@@ -1,6 +1,6 @@
 About
 
-This App was created to allow users to play their favourite songs and create playlist
+This App was created to allow users to play their favourite songs and create playlist.
 
 
 Skills Demonstrated
